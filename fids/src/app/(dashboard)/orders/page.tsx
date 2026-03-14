@@ -23,6 +23,7 @@ export default function OrdersPage() {
     const [isDetailOpen, setIsDetailOpen] = React.useState(false);
     const [isRejectModalOpen, setIsRejectModalOpen] = React.useState(false);
     const [searchQuery, setSearchQuery] = React.useState("");
+    const [showAdvancedFilters, setShowAdvancedFilters] = React.useState(false);
 
     const fetchOrders = async () => {
         try {
@@ -114,32 +115,73 @@ export default function OrdersPage() {
                 </div>
 
                 {/* Search & Filters */}
-                <div className="flex flex-col lg:flex-row items-stretch lg:items-center gap-4 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-black/5">
-                    <div className="flex-1">
-                        <Input
-                            placeholder="Search by order ID or farmer name..."
-                            icon={<Search size={18} />}
-                            className="h-10 border-none bg-background-alt"
-                            value={searchQuery}
-                            onChange={(e) => setSearchQuery(e.target.value)}
-                        />
-                    </div>
-                    <div className="flex flex-wrap gap-2">
-                        <div className="flex-1 sm:flex-none flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 text-text-secondary">
-                            <MapPin size={16} />
-                            <select className="bg-transparent text-sm font-medium outline-none h-10 w-full sm:w-32 cursor-pointer">
-                                <option>All Regions</option>
-                                <option>Dakar</option>
-                                <option>Thiès</option>
-                                <option>Saint-Louis</option>
-                            </select>
+                <div className="flex flex-col gap-4">
+                    <div className="flex flex-col lg:flex-row items-stretch lg:items-center gap-4 rounded-2xl bg-white p-4 shadow-sm ring-1 ring-black/5">
+                        <div className="flex-1">
+                            <Input
+                                placeholder="Search by order ID or farmer name..."
+                                icon={<Search size={18} />}
+                                className="h-10 border-none bg-background-alt"
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                            />
                         </div>
-                        <div className="flex-1 sm:flex-none flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 text-text-secondary whitespace-nowrap">
-                            <Calendar size={16} />
-                            <span className="text-sm font-medium">All Time</span>
+                        <div className="flex flex-wrap gap-2">
+                            <div className="flex-1 sm:flex-none flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 text-text-secondary">
+                                <MapPin size={16} />
+                                <select className="bg-transparent text-sm font-medium outline-none h-10 w-full sm:w-32 cursor-pointer">
+                                    <option>All Regions</option>
+                                    <option>Dakar</option>
+                                    <option>Thiès</option>
+                                    <option>Saint-Louis</option>
+                                </select>
+                            </div>
+                            <div className="flex-1 sm:flex-none flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 text-text-secondary whitespace-nowrap">
+                                <Calendar size={16} />
+                                <span className="text-sm font-medium">All Time</span>
+                            </div>
+                            <Button 
+                                variant="outline" 
+                                className={cn(
+                                    "flex-1 sm:flex-none border-gray-200 h-10 px-4 transition-all",
+                                    showAdvancedFilters ? "bg-primary text-white border-primary" : "text-text-secondary"
+                                )}
+                                onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
+                            >
+                                More
+                            </Button>
                         </div>
-                        <Button variant="outline" className="flex-1 sm:flex-none border-gray-200 text-text-secondary h-10 px-4">More</Button>
                     </div>
+
+                    {showAdvancedFilters && (
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-white p-4 rounded-2xl shadow-sm ring-1 ring-black/5 animate-in slide-in-from-top-2 duration-200">
+                             <div className="flex flex-col gap-1.5">
+                                <label className="text-xs font-bold text-text-secondary uppercase tracking-wider">Price Range (FCFA)</label>
+                                <div className="flex items-center gap-2">
+                                    <input type="number" placeholder="Min" className="w-full h-9 rounded-lg border border-gray-200 px-3 text-sm outline-none focus:ring-1 focus:ring-primary" />
+                                    <span className="text-gray-400">-</span>
+                                    <input type="number" placeholder="Max" className="w-full h-9 rounded-lg border border-gray-200 px-3 text-sm outline-none focus:ring-1 focus:ring-primary" />
+                                </div>
+                            </div>
+                            <div className="flex flex-col gap-1.5">
+                                <label className="text-xs font-bold text-text-secondary uppercase tracking-wider">Order Priority</label>
+                                <select className="w-full h-9 rounded-lg border border-gray-200 px-3 text-sm outline-none focus:ring-1 focus:ring-primary">
+                                    <option>All Priorities</option>
+                                    <option>High</option>
+                                    <option>Standard</option>
+                                    <option>Low</option>
+                                </select>
+                            </div>
+                            <div className="flex flex-col gap-1.5">
+                                <label className="text-xs font-bold text-text-secondary uppercase tracking-wider">Sort Orders</label>
+                                <select className="w-full h-9 rounded-lg border border-gray-200 px-3 text-sm outline-none focus:ring-1 focus:ring-primary">
+                                    <option>Newest First</option>
+                                    <option>Oldest First</option>
+                                    <option>Quantity: High to Low</option>
+                                </select>
+                            </div>
+                        </div>
+                    )}
                 </div>
 
                 {/* Orders Table */}

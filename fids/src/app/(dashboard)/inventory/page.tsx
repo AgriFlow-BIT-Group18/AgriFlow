@@ -24,6 +24,7 @@ export default function InventoryPage() {
     const [searchQuery, setSearchQuery] = React.useState("");
     const [selectedCategory, setSelectedCategory] = React.useState("All Categories");
     const [selectedStatus, setSelectedStatus] = React.useState("All Status");
+    const [showAdvancedFilters, setShowAdvancedFilters] = React.useState(false);
 
     const [newItemName, setNewItemName] = React.useState("");
     const [newItemCategory, setNewItemCategory] = React.useState("Fertilizer");
@@ -196,12 +197,52 @@ export default function InventoryPage() {
                             <option>Low Stock</option>
                             <option>Out of Stock</option>
                         </select>
-                        <Button variant="outline" className="flex-1 sm:flex-none h-10 px-4 gap-2 border-gray-200 text-text-secondary hover:text-primary">
+                        <Button 
+                            variant="outline" 
+                            className={cn(
+                                "flex-1 sm:flex-none h-10 px-4 gap-2 border-gray-200 transition-all",
+                                showAdvancedFilters ? "bg-primary text-white border-primary" : "text-text-secondary hover:text-primary"
+                            )}
+                            onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
+                        >
                             <Filter size={16} />
                             More
                         </Button>
                     </div>
                 </div>
+
+                {showAdvancedFilters && (
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-white p-4 rounded-2xl shadow-sm ring-1 ring-black/5 animate-in slide-in-from-top-2 duration-200">
+                         <div className="flex flex-col gap-1.5">
+                            <label className="text-xs font-bold text-text-secondary uppercase tracking-wider">Unit Type</label>
+                            <select className="w-full h-9 rounded-lg border border-gray-200 px-3 text-sm outline-none focus:ring-1 focus:ring-primary">
+                                <option>All Units</option>
+                                <option>kg</option>
+                                <option>bag</option>
+                                <option>litre</option>
+                                <option>unit</option>
+                            </select>
+                        </div>
+                        <div className="flex flex-col gap-1.5">
+                            <label className="text-xs font-bold text-text-secondary uppercase tracking-wider">Stock Range</label>
+                            <div className="flex items-center gap-2">
+                                <input type="number" placeholder="Min" className="w-full h-9 rounded-lg border border-gray-200 px-3 text-sm outline-none focus:ring-1 focus:ring-primary" />
+                                <span className="text-gray-400">-</span>
+                                <input type="number" placeholder="Max" className="w-full h-9 rounded-lg border border-gray-200 px-3 text-sm outline-none focus:ring-1 focus:ring-primary" />
+                            </div>
+                        </div>
+                        <div className="flex flex-col gap-1.5">
+                            <label className="text-xs font-bold text-text-secondary uppercase tracking-wider">Sort Rules</label>
+                            <select className="w-full h-9 rounded-lg border border-gray-200 px-3 text-sm outline-none focus:ring-1 focus:ring-primary">
+                                <option>Name (A-Z)</option>
+                                <option>Name (Z-A)</option>
+                                <option>Stock: Low to High</option>
+                                <option>Stock: High to Low</option>
+                                <option>Price: High to Low</option>
+                            </select>
+                        </div>
+                    </div>
+                )}
 
                 {/* Inventory Table */}
                 <div className="rounded-2xl bg-white shadow-sm ring-1 ring-black/5 overflow-hidden">
