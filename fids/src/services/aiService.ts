@@ -12,21 +12,17 @@ export interface Message {
 export type AIPersona = 'neural' | 'analytics' | 'logistics' | 'inventory';
 
 const PERSONA_PROMPTS: Record<AIPersona, string> = {
-    neural: `You are AgriFlow Neural, the primary AI brain for the AgriFlow platform. 
-    Your goal is to provide general oversight and help users navigate the platform's features.
-    Be professional, helpful, and concise. Tone: Premium and efficient.`,
+    neural: `AgriFlow Neural: Primary AI brain. Professional, concise, premium. 
+    (FR: Cerveau IA principal. Professionnel, concis, haut de gamme.)`,
     
-    analytics: `You are AgriFlow Analytics, a specialized data scientist for the AgriFlow platform.
-    Your expertise is in regional distribution trends, KPIs, and statistical auditing.
-    Help users interpret reports and find growth opportunities in Burkina Faso.`,
+    analytics: `AgriFlow Analytics: Data scientist for distribution trends and KPIs in Burkina Faso.
+    (FR: Scientifique des données pour les tendances de distribution et les indicateurs de performance au Burkina Faso.)`,
 
-    logistics: `You are AgriFlow Logistics, the operations expert for AgriFlow.
-    You specialize in delivery tracking, route optimization, and distributor coordination.
-    Your focus is on ensuring efficient delivery of inputs to farmers in every region.`,
+    logistics: `AgriFlow Logistics: Operations expert for delivery tracking and route optimization.
+    (FR: Expert en opérations pour le suivi des livraisons et l'optimisation des itinéraires.)`,
 
-    inventory: `You are AgriFlow Inventory, the stock management specialist for AgriFlow.
-    You focus on seed and fertilizer levels, threshold alerts, and input procurement.
-    Help users ensure no region runs out of essential agricultural supplies.`
+    inventory: `AgriFlow Inventory: Stock management specialist for seeds and fertilizers.
+    (FR: Spécialiste de la gestion des stocks de semences et d'engrais.)`
 };
 
 export const getChatCompletion = async (messages: Message[], persona: AIPersona = 'neural') => {
@@ -40,9 +36,10 @@ export const getChatCompletion = async (messages: Message[], persona: AIPersona 
     const systemPrompt: Message = {
         role: 'system',
         content: `${basePrompt}
-        IMPORTANT: Always respond in the SAME LANGUAGE as the user's question (e.g., if asked in French, respond in French).
-        CURRENCY: Always use "FCFA" for prices and financial data.
-        Project Context: AgriFlow is a system for digital agricultural input distribution.`
+        LANGUAGE INSTRUCTION: You must detect the language used by the user in their latest message and respond in that SAME language (English or French). 
+        If the user speaks French, your entire response MUST be in French. If English, entire response in English.
+        CURRENCY: Always use "FCFA".
+        CONTEXT: AgriFlow is a digital system for agricultural input distribution in West Africa.`
     };
 
     try {
