@@ -1,0 +1,314 @@
+"use client";
+
+import * as React from "react";
+import DashboardLayout from "@/components/layout/DashboardLayout";
+import { User, Lock, Bell, Shield, MapPin, Globe, Save } from "lucide-react";
+import { Button } from "@/components/ui/Button";
+import { Input } from "@/components/ui/Input";
+import { Badge } from "@/components/ui/Badge";
+import { cn } from "@/lib/utils";
+
+export default function SettingsPage() {
+    const [activeTab, setActiveTab] = React.useState("profile");
+    const [user, setUser] = React.useState<any>(null);
+    const [isSaving, setIsSaving] = React.useState(false);
+    const [saveMessage, setSaveMessage] = React.useState<{ type: 'success' | 'error', text: string } | null>(null);
+
+    // Profile state
+    const [name, setName] = React.useState("");
+    const [email, setEmail] = React.useState("");
+    const [phone, setPhone] = React.useState("");
+
+    // Security state
+    const [currentPassword, setCurrentPassword] = React.useState("");
+    const [newPassword, setNewPassword] = React.useState("");
+    const [confirmPassword, setConfirmPassword] = React.useState("");
+
+    const fileInputRef = React.useRef<HTMLInputElement>(null);
+
+    React.useEffect(() => {
+        const storedUser = localStorage.getItem('user');
+        if (storedUser) {
+            const userData = JSON.parse(storedUser);
+            setUser(userData);
+            setName(userData.name || "");
+            setEmail(userData.email || "");
+            setPhone(userData.phone || "");
+        }
+    }, []);
+
+    const handleSaveProfile = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!user) return;
+        setIsSaving(true);
+        setSaveMessage(null);
+
+        try {
+            const { updateUser } = await import("@/services/userService");
+            const updatedUser = await updateUser(user._id, { name, email, phone });
+            
+            // Update local storage
+            const newUser = { ...user, ...updatedUser };
+            localStorage.setItem('user', JSON.stringify(newUser));
+            setUser(newUser);
+            
+            setSaveMessage({ type: 'success', text: "Profile updated successfully!" });
+        } catch (err) {
+            console.error(err);
+            setSaveMessage({ type: 'error', text: "Failed to update profile. Please try again." });
+        } finally {
+            setIsSaving(false);
+        }
+    };
+
+    const handleUpdatePassword = async (e: React.FormEvent) => {
+        e.preventDefault();
+        if (!user) return;
+        
+        if (newPassword !== confirmPassword) {
+            setSaveMessage({ type: 'error', text: "New passwords do not match." });
+            return;
+        }
+
+        setIsSaving(true);
+        setSaveMessage(null);
+
+        try {
+            const { updateUser } = await import("@/services/userService");
+            await updateUser(user._id, { password: newPassword });
+            setSaveMessage({ type: 'success', text: "Password updated successfully!" });
+            setCurrentPassword("");
+            setNewPassword("");
+            setConfirmPassword("");
+        } catch (err) {
+            console.error(err);
+            setSaveMessage({ type: 'error', text: "Failed to update password." });
+        } finally {
+            setIsSaving(false);
+        }
+    };
+
+    const tabs = [
+        { id: "profile", label: "Account Profile", icon: User },
+        { id: "security", label: "Security & Password", icon: Lock },
+        { id: "notifications", label: "Notifications", icon: Bell },
+        { id: "regional", label: "Regional Zones", icon: MapPin },
+    ];
+
+    return (
+        <DashboardLayout>
+            <div className="flex flex-col gap-6">
+                <div>
+                    <h1 className="text-2xl font-bold text-text-primary">System Settings</h1>
+                    <p className="text-text-secondary">Manage your account preferences and system configuration.</p>
+                </div>
+
+                {saveMessage && (
+                    <div className={cn(
+                        "rounded-xl p-4 text-sm font-bold border animate-in slide-in-from-top duration-300",
+                        saveMessage.type === 'success' ? "bg-green-50 border-green-100 text-green-700" : "bg-red-50 border-red-100 text-red-700"
+                    )}>
+                        {saveMessage.text}
+                    </div>
+                )}
+
+                <div className="flex flex-col gap-8 lg:flex-row">
+                    {/* Navigation Sidebar */}
+                    <div className="w-full lg:w-64 shrink-0">
+                        <div className="flex flex-col gap-1 rounded-2xl bg-white p-2 shadow-sm ring-1 ring-black/5">
+                            {tabs.map((tab) => (
+                                <button
+                                    key={tab.id}
+                                    onClick={() => {
+                                        setActiveTab(tab.id);
+                                        setSaveMessage(null);
+                                    }}
+                                    className={cn(
+                                        "flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-bold transition-all",
+                                        activeTab === tab.id
+                                            ? "bg-primary text-white shadow-lg shadow-primary/20"
+                                            : "text-text-secondary hover:bg-background-alt hover:text-text-primary"
+                                    )}
+                                >
+                                    <tab.icon size={18} />
+                                    {tab.label}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Settings Content */}
+                    <div className="flex-1 rounded-3xl bg-white p-8 shadow-sm ring-1 ring-black/5">
+                        {activeTab === "profile" && (
+                            <form className="space-y-8 animate-in fade-in duration-500" onSubmit={handleSaveProfile}>
+                                <div className="flex flex-col gap-6 sm:flex-row sm:items-center">
+                                    <div className="relative group">
+                                        <div className="flex h-24 w-24 items-center justify-center rounded-full bg-primary/10 text-primary text-3xl font-bold border-4 border-white shadow-xl ring-1 ring-gray-100">
+                                            {name ? name.charAt(0).toUpperCase() : "U"}
+                                        </div>
+                                        <button type="button" className="absolute -bottom-1 -right-1 flex h-8 w-8 items-center justify-center rounded-full bg-white text-text-secondary shadow-lg border border-gray-100 hover:text-primary transition-all">
+                                            <Globe size={14} />
+                                        </button>
+                                    </div>
+                                    <div>
+                                        <h3 className="text-lg font-bold text-text-primary">Profile Picture</h3>
+                                        <p className="text-sm text-text-secondary">JPG, GIF or PNG. Max size of 800K.</p>
+                                        <div className="mt-3 flex gap-2">
+                                            <input
+                                                type="file"
+                                                ref={fileInputRef}
+                                                className="hidden"
+                                                accept="image/*"
+                                                onChange={(e) => {
+                                                    const file = e.target.files?.[0];
+                                                    if (file) {
+                                                        console.log("Selected file:", file.name);
+                                                    }
+                                                }}
+                                            />
+                                            <Button
+                                                type="button"
+                                                variant="outline"
+                                                size="sm"
+                                                className="h-9 px-4"
+                                                onClick={() => fileInputRef.current?.click()}
+                                            >
+                                                Upload New
+                                            </Button>
+                                            <Button type="button" variant="ghost" size="sm" className="h-9 px-4 text-status-rejected">Remove</Button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
+                                    <Input label="Full Name" value={name} onChange={(e) => setName(e.target.value)} />
+                                    <Input label="Email Address" type="email" value={email} onChange={(e) => setEmail(e.target.value)} />
+                                    <Input label="Phone Number" value={phone} onChange={(e) => setPhone(e.target.value)} />
+                                    <div className="space-y-1.5">
+                                        <label className="text-sm font-bold text-text-primary">System Language</label>
+                                        <select className="h-10 w-full rounded-md border border-gray-300 bg-white px-3 text-sm outline-none focus:ring-2 focus:ring-primary">
+                                            <option>French (Français)</option>
+                                            <option>English</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div className="pt-6 border-t border-gray-100 flex justify-end">
+                                    <Button type="submit" className="gap-2 px-8 shadow-lg shadow-primary/20" isLoading={isSaving}>
+                                        <Save size={18} />
+                                        Save Profile
+                                    </Button>
+                                </div>
+                            </form>
+                        )}
+
+                        {activeTab === "security" && (
+                            <form className="max-w-md space-y-8 animate-in fade-in duration-500" onSubmit={handleUpdatePassword}>
+                                <div className="space-y-4">
+                                    <h3 className="text-lg font-bold text-text-primary flex items-center gap-2">
+                                        <Lock size={20} className="text-primary" /> Update Password
+                                    </h3>
+                                    <p className="text-sm text-text-secondary">Ensure your account is using a long, random password to stay secure.</p>
+                                </div>
+
+                                <div className="space-y-4">
+                                    <Input label="Current Password" type="password" placeholder="••••••••" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} />
+                                    <Input label="New Password" type="password" placeholder="••••••••" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} />
+                                    <Input label="Confirm New Password" type="password" placeholder="••••••••" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
+                                </div>
+                                <div className="rounded-xl bg-amber-50 p-4 border border-amber-100 flex gap-3 text-amber-800">
+                                    <Shield size={20} className="shrink-0" />
+                                    <div className="text-sm">
+                                        <p className="font-bold">Two-Factor Authentication (2FA)</p>
+                                        <p className="opacity-90">Add an extra layer of security to your account by enabling 2FA.</p>
+                                        <button type="button" className="mt-2 font-bold underline">Setup 2FA now</button>
+                                    </div>
+                                </div>
+
+                                <div className="pt-6 border-t border-gray-100">
+                                    <Button type="submit" className="w-full" isLoading={isSaving}>Update Password</Button>
+                                </div>
+                            </form>
+                        )}
+
+                        {activeTab === "notifications" && (
+                            <div className="space-y-8 animate-in fade-in duration-500">
+                                <div className="space-y-1">
+                                    <h3 className="text-lg font-bold text-text-primary">Communication Preferences</h3>
+                                    <p className="text-sm text-text-secondary">Control which notifications you want to receive.</p>
+                                </div>
+
+                                <div className="space-y-4">
+                                    {[
+                                        { icon: Bell, label: "Order Status Updates", desc: "Receive alerts when an order is approved, rejected or delivered.", default: true },
+                                        { icon: MapPin, label: "Zone Alerts", desc: "Notifications about stock movements and distributor activities in your zone.", default: true },
+                                        { icon: Shield, label: "Security & Login", desc: "Notifications about new logins and security changes.", default: false },
+                                    ].map((item, i) => (
+                                        <div key={i} className="flex items-start justify-between rounded-2xl border border-gray-100 p-6 transition-all hover:bg-background-alt">
+                                            <div className="flex gap-4">
+                                                <div className="rounded-xl bg-primary/5 p-2 text-primary">
+                                                    <item.icon size={20} />
+                                                </div>
+                                                <div>
+                                                    <p className="font-bold text-text-primary text-sm">{item.label}</p>
+                                                    <p className="text-xs text-text-secondary max-w-sm">{item.desc}</p>
+                                                </div>
+                                            </div>
+                                            <div className="relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full bg-primary transition-all">
+                                                <div className="ml-5 h-5 w-5 rounded-full bg-white shadow-sm" />
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+
+                                <div className="pt-6 border-t border-gray-100 flex justify-end">
+                                    <Button 
+                                        className="gap-2 px-8" 
+                                        onClick={() => {
+                                            setSaveMessage({ type: "success", text: "Notification preferences saved successfully!" });
+                                            setTimeout(() => setSaveMessage(null), 3000);
+                                        }}
+                                    >
+                                        Save Preferences
+                                    </Button>
+                                </div>
+                            </div>
+                        )}
+
+                        {activeTab === "regional" && (
+                            <div className="space-y-6 animate-in fade-in duration-500">
+                                <div className="flex items-center justify-between">
+                                    <div>
+                                        <h3 className="text-lg font-bold text-text-primary">Regional Assignment</h3>
+                                        <p className="text-sm text-text-secondary">Your assigned operational zone for distribution.</p>
+                                    </div>
+                                    <Badge status="approved">Active Zone</Badge>
+                                </div>
+
+                                <div className="rounded-2xl border border-primary/20 bg-primary/5 p-8 flex flex-col items-center text-center gap-4">
+                                    <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-primary text-white shadow-xl">
+                                        <MapPin size={32} />
+                                    </div>
+                                    <div>
+                                        <h4 className="text-2xl font-extrabold text-text-primary">Dakar Metropolitan</h4>
+                                        <p className="text-sm font-semibold text-primary">Assigned Zone ID: ZONE-SN-DKR-01</p>
+                                    </div>
+                                    <div className="flex gap-4 text-xs font-bold text-text-secondary uppercase tracking-widest mt-2">
+                                        <span>325 Farmers</span>
+                                        <span>•</span>
+                                        <span>12 Distribution Points</span>
+                                    </div>
+                                </div>
+
+                                <div className="rounded-xl border border-gray-100 p-6 flex items-center justify-between text-sm">
+                                    <p className="text-text-secondary">Need to change your assigned region?</p>
+                                    <Button variant="outline" size="sm">Request Transfer</Button>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            </div>
+        </DashboardLayout>
+    );
+}

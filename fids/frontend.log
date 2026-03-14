@@ -1,0 +1,22 @@
+
+> fids@0.1.0 dev
+> next dev
+
+  ▲ Next.js 14.2.35
+  - Local:        http://localhost:3000
+
+ ✓ Starting...
+ ✓ Ready in 3.1s
+ ○ Compiling / ...
+ ✓ Compiled / in 2.4s (492 modules)
+ GET / 307 in 2861ms
+ ○ Compiling /login ...
+ ✓ Compiled /login in 2.8s (714 modules)
+ GET /login 200 in 2748ms
+ ○ Compiling /dashboard ...
+ ✓ Compiled /dashboard in 1938ms (832 modules)
+ ○ Compiling /inventory ...
+ ✓ Compiled /inventory in 609ms (858 modules)
+ ○ Compiling /orders ...
+ ✓ Compiled /orders in 1436ms (872 modules)
+ ✓ Compiled /deliveries in 282ms (884 modules)

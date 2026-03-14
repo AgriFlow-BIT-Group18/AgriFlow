@@ -1,0 +1,35 @@
+# dependencies
+node_modules/
+fids/node_modules/
+
+# testing
+coverage/
+fids/coverage/
+
+# next.js
+fids/.next/
+fids/out/
+
+# production
+build/
+fids/build/
+
+# misc
+.DS_Store
+*.pem
+
+# local env files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+fids/.env
+fids/.env.local
+fids/.env.development.local
+fids/.env.test.local
+fids/.env.production.local
+
+# typescript
+*.tsbuildinfo
+fids/next-env.d.ts
