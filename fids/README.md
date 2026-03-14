@@ -1,71 +1,61 @@
-# AgroFlow Web Portal - Frontend
+# AgriFlow Web Dashboard (FIDS) 🖥️
 
-Bienvenue sur le front-end du portail Web de **AgroFlow** (Agricultural Input Distribution System). Ce projet a été développé en se basant sur les designs Figma/Stitch pour moderniser la distribution des intrants agricoles.
+The **Frontend Interface for Distribution Systems (FIDS)** is the administrative command center of the AgriFlow ecosystem. It provides system administrators and distributors with powerful tools to manage, audit, and analyze agricultural resource distribution.
 
-## 🚀 Technologies Utilisées
+## 🚀 Key Features
 
-*   **Framework** : [Next.js 14](https://nextjs.org/) (App Router)
-*   **Langage** : [TypeScript](https://www.typescript.org/)
-*   **Stylisation** : [Tailwind CSS](https://tailwindcss.com/)
-*   **Icônes** : [Lucide React](https://lucide.dev/)
-*   **Police** : Inter (Google Fonts)
+- **Executive Dashboard**: Real-time overview of active orders, deliveries, and top-performing products.
+- **Inventory Management**: Comprehensive CRUD interface for managing agricultural inputs.
+- **Order Audit System**: Workflow for reviewing, approving, or rejecting farmer orders.
+- **Delivery Orchestration**: Tools to schedule deliveries, assign drivers, and track progress.
+- **Advanced analytics**: Interactive reports with regional performance tracking (Burkina Faso), volume trends, and export capabilities.
+- **User Management**: Centralized hub for managing staff and farmer accounts with activity tracking.
+- **AI-Powered Sidekick**: Integrated, multi-model AI assistant for immediate logistics and inventory support.
 
-## 📁 Structure du Projet
+## 🛠️ Tech Stack
 
-```text
-src/
-├── app/                  # Routes et pages (Login, Dashboard, etc.)
-├── components/
-│   ├── ui/               # Composants atomiques réutilisables (Button, Input, Badge...)
-│   └── layout/           # Composants de structure (Sidebar, Header, DashboardLayout)
-├── lib/                  # Utilitaires (cn, formatters)
-├── hooks/                # Hooks React personnalisés
-├── services/             # Logique d'appel API
-└── types/                # Définitions de types TypeScript
-```
+- **Framework**: Next.js 14 (App Router)
+- **Language**: TypeScript
+- **Styling**: Tailwind CSS
+- **Icons**: Lucide React
+- **Data Fetching**: Axios
+- **State Management**: React Context & Hooks
 
-## 🌐 Pages Implémentées (Admin / Distributeur)
+## 📂 Project Structure
 
-Toutes les pages respectent strictement la charte graphique définie :
+- `src/app/`: Next.js App Router pages and layouts.
+    - `(dashboard)/`: Protected dashboard routes (Orders, Deliveries, Inventory, etc.).
+    - `login/`: Authentication interface.
+- `src/components/`:
+    - `layout/`: Global components (Sidebar, Header, DashboardLayout).
+    - `ui/`: Reusable, atomic UI components (Badge, Table, Modal).
+- `src/services/`: API abstractions and service layers for orders, users, and analytics.
+- `src/lib/`: Utility functions and shared helpers.
 
-1.  **Connexion (`/login`)** : Accès sécurisé avec choix de rôle.
-2.  **Tableau de bord (`/dashboard`)** : Vue panoramique des activités, stocks et commandes.
-3.  **Gestion des Stocks (`/inventory`)** : Suivi du catalogue avec alertes visuelles sur les seuils critiques.
-4.  **Gestion des Commandes (`/orders`)** : Workflow complet d'approbation et de rejet des demandes.
-5.  **Suivi des Livraisons (`/deliveries`)** : Pipeline logistique temps réel pour les expéditions.
-6.  **Analyses & Rapports (`/reports`)** : Statistiques avancées et performances régionales.
-7.  **Gestion des Utilisateurs (`/users`)** : Administration des membres de l'équipe et des zones d'affectation.
-8.  **Assistant IA (`AgroFlow AI`)** : Chatbot flottant intégré pour l'aide à la décision.
+## 🔑 Permissions (RBAC)
 
-## 🎨 Design System
+- **Admin**: Full read/write access to all sections.
+- **Distributor**: Professional read access. Can audit all systems, view reports, and track deliveries, but is restricted from modifying core inventory or user data.
 
-*   **Couleur Primaire** : Vert AgroFlow (`#2D6A4F`)
-*   **Couleurs de Statut** : 
-    *   `Approved` : Vert
-    *   `Pending` : Jaune
-    *   `Rejected` : Rouge
-    *   `Delivery` : Bleu
-*   **Typographie** : Inter (Sans-serif) pour une lisibilité optimale.
+## 🚀 Getting Started
 
-## 🛠️ Installation et Lancement
-
-Pour cloner et lancer le projet localement :
-
-1.  **Installation des dépendances** :
+1.  **Install dependencies**:
     ```bash
     npm install
     ```
-
-2.  **Lancement du serveur de développement** :
+2.  **Environment Setup**:
+    - Build a `.env` file pointing to your Backend URL.
+3.  **Run Development Environment**:
     ```bash
     npm run dev
     ```
-    L'application sera accessible sur `http://localhost:3000`.
-
-3.  **Build pour la production** :
+4.  **Build for Production**:
     ```bash
     npm run build
     ```
 
-## 📝 Note de Développement
-Toutes les pages utilisent actuellement des **données simulées (Mock Data)** pour garantir l'intégrité visuelle pendant la phase de développement front-end. L'étape suivante consistera à connecter ces interfaces au backend AgroFlow.
+---
+
+## 📄 License
+
+© 2026 AgriFlow Ecosystem. All rights reserved.
