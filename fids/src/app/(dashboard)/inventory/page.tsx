@@ -106,6 +106,12 @@ export default function InventoryPage() {
     };
 
     React.useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        const statusParam = params.get("status");
+        if (statusParam) {
+            setSelectedStatus(statusParam);
+        }
+        
         setUser(getCurrentUser());
         fetchItems();
     }, []);
@@ -277,7 +283,7 @@ export default function InventoryPage() {
                                         </div>
                                     )
                                 },
-                                { header: "Unit", accessor: "unit", className: "text-text-secondary" },
+                                { header: "Unit", accessor: "unit", className: "text-text-secondary", hiddenOnMobile: true },
                                 {
                                     header: "Current Stock",
                                     accessor: (item: APIProduct) => (
@@ -289,7 +295,7 @@ export default function InventoryPage() {
                                         </span>
                                     )
                                 },
-                                { header: "Min Threshold", accessor: "minThreshold", className: "text-text-secondary font-medium" },
+                                { header: "Min Threshold", accessor: "minThreshold", className: "text-text-secondary font-medium", hiddenOnMobile: true },
                                 {
                                     header: "Price/Unit",
                                     accessor: (item: APIProduct) => (
@@ -357,7 +363,7 @@ export default function InventoryPage() {
                             value={newItemName}
                             onChange={(e) => setNewItemName(e.target.value)}
                         />
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div className="space-y-1.5">
                                 <label className="text-sm font-medium text-text-primary">Category*</label>
                                 <select
@@ -378,7 +384,7 @@ export default function InventoryPage() {
                                 onChange={(e) => setNewItemUnit(e.target.value)}
                             />
                         </div>
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <Input
                                 label="Initial Quantity*"
                                 type="number"

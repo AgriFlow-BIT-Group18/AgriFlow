@@ -57,7 +57,7 @@ export default function LoginPage() {
                         <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white/10 backdrop-blur-md">
                             <Leaf className="text-secondary fill-current" size={28} />
                         </div>
-                        <span className="text-3xl font-bold tracking-tight">AgroFlow</span>
+                        <span className="text-3xl font-bold tracking-tight">AgriFlow</span>
                     </div>
 
                     <div className="max-w-lg">
@@ -70,7 +70,7 @@ export default function LoginPage() {
                     </div>
 
                     <div className="text-sm text-white/50">
-                        © 2026 AgroFlow Ecosystem • All rights reserved.
+                        © 2026 AgriFlow Ecosystem • All rights reserved.
                     </div>
                 </div>
             </div>

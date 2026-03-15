@@ -148,7 +148,7 @@ export default function ReportsPage() {
 
                     {/* Regional Breakdown */}
                     <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-black/5 h-full">
-                        <h3 className="mb-8 text-lg font-bold text-text-primary">Regional Performance (Burkina Faso)</h3>
+                        <h3 className="mb-8 text-lg font-bold text-text-primary">Country Performance (International)</h3>
                         <div className="space-y-6">
                             {data.regionalPerformance.map((reg, i) => (
                                 <div key={i} className="space-y-2">
@@ -180,10 +180,10 @@ export default function ReportsPage() {
                     <div className="overflow-x-auto">
                         <Table
                             columns={[
-                                { header: "ID", accessor: (tx: any) => <span className="font-mono text-xs text-primary font-bold">{tx.id.substring(0, 8)}</span> },
-                                { header: "Date", accessor: (tx: any) => new Date(tx.date).toLocaleDateString() + ' ' + new Date(tx.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) },
+                                { header: "ID", accessor: (tx: any) => <span className="font-mono text-xs text-primary font-bold">{tx.id.substring(0, 8)}</span>, hiddenOnMobile: true },
+                                { header: "Date", accessor: (tx: any) => new Date(tx.date).toLocaleDateString() + ' ' + new Date(tx.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}), hiddenOnMobile: true },
                                 { header: "Farmer", accessor: (tx: any) => <span className="font-bold">{tx.farmer}</span> },
-                                { header: "Region", accessor: (tx: any) => tx.region },
+                                { header: "Country", accessor: (tx: any) => tx.region, hiddenOnMobile: true },
                                 { header: "Amount", accessor: (tx: any) => <span className="font-bold text-primary">{tx.amount}</span> },
                                 { 
                                     header: "Status", 

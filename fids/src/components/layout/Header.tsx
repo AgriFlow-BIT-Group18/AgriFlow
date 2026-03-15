@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 export interface HeaderProps {
     userName: string;
     role: "admin" | "distributor";
+    avatar?: string;
     notificationCount?: number;
     onMenuToggle?: () => void;
 }
@@ -16,10 +17,12 @@ export interface HeaderProps {
 const Header: React.FC<HeaderProps> = ({
     userName,
     role,
+    avatar,
     notificationCount = 0,
     onMenuToggle,
 }) => {
     const [isProfileOpen, setIsProfileOpen] = React.useState(false);
+    const [isSearchVisible, setIsSearchVisible] = React.useState(false);
 
     const handleLogout = () => {
         logout();
@@ -27,27 +30,54 @@ const Header: React.FC<HeaderProps> = ({
 
     return (
         <header className="sticky top-0 z-30 flex h-16 w-full items-center justify-between border-b border-gray-200 bg-white px-4 md:px-8 shadow-sm">
-            <div className="flex w-full md:w-96 max-w-sm items-center gap-3">
-                <button 
-                    onClick={onMenuToggle}
-                    className="lg:hidden rounded-lg p-2 text-text-secondary hover:bg-background-alt transition-colors"
-                >
-                    <Menu size={24} />
-                </button>
-                <div className="relative hidden md:flex w-full items-center">
+            <div className={cn(
+                "flex items-center gap-3 transition-all duration-300",
+                isSearchVisible ? "w-full" : "w-auto md:w-96 max-w-sm"
+            )}>
+                {!isSearchVisible && (
+                    <button 
+                        onClick={onMenuToggle}
+                        className="lg:hidden rounded-lg p-2 text-text-secondary hover:bg-background-alt transition-colors"
+                    >
+                        <Menu size={24} />
+                    </button>
+                )}
+                
+                <div className={cn(
+                    "relative items-center transition-all duration-300",
+                    isSearchVisible ? "flex w-full" : "hidden md:flex w-full"
+                )}>
+                    {isSearchVisible && (
+                        <button 
+                            onClick={() => setIsSearchVisible(false)}
+                            className="mr-2 md:hidden rounded-lg p-2 text-text-secondary hover:bg-background-alt"
+                        >
+                            <ChevronDown className="rotate-90" size={20} />
+                        </button>
+                    )}
                     <Search
                         size={18}
-                        className="absolute left-3 text-text-secondary pointer-events-none"
+                        className="absolute left-10 md:left-3 text-text-secondary pointer-events-none"
                     />
                     <input
                         type="text"
                         placeholder="Search dashboard..."
+                        autoFocus={isSearchVisible}
                         className="h-10 w-full rounded-full border border-gray-200 bg-background-alt pl-10 pr-4 text-sm transition-all focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
                     />
                 </div>
             </div>
 
-            <div className="flex items-center gap-6">
+            <div className={cn(
+                "flex items-center gap-2 sm:gap-6",
+                isSearchVisible && "hidden"
+            )}>
+                <button 
+                    onClick={() => setIsSearchVisible(true)}
+                    className="md:hidden rounded-full p-2 text-text-secondary hover:bg-background-alt"
+                >
+                    <Search size={20} />
+                </button>
                 <button className="relative rounded-full p-2 text-text-secondary hover:bg-background-alt transition-colors">
                     <Bell size={20} />
                     {notificationCount > 0 && (
@@ -64,8 +94,16 @@ const Header: React.FC<HeaderProps> = ({
                         onClick={() => setIsProfileOpen(!isProfileOpen)}
                         className="flex items-center gap-3 rounded-lg p-1 transition-all hover:bg-background-alt"
                     >
-                        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/10 text-primary font-semibold border border-primary/20">
-                            {userName.charAt(0)}
+                        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/10 text-primary font-semibold border border-primary/20 overflow-hidden">
+                            {avatar ? (
+                                <img 
+                                    src={avatar.startsWith('http') ? avatar : `${process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'http://localhost:5000'}${avatar}`} 
+                                    alt={userName} 
+                                    className="h-full w-full object-cover"
+                                />
+                            ) : (
+                                userName.charAt(0)
+                            )}
                         </div>
                         <div className="hidden text-left sm:block">
                             <p className="text-sm font-semibold text-text-primary leading-tight">

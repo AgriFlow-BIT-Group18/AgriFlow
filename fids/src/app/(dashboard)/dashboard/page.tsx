@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
+import Link from "next/link";
 import {
     TrendingUp,
     AlertTriangle,
@@ -9,7 +10,8 @@ import {
     Truck,
     ArrowUpRight,
     ChevronRight,
-    MoreVertical
+    MoreVertical,
+    Users
 } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
@@ -18,21 +20,35 @@ import { cn } from "@/lib/utils";
 
 import { getOrders, Order as APIOrder } from "@/services/orderService";
 import { getProducts, Product as APIProduct } from "@/services/productService";
+import { getUsers, User as APIUser } from "@/services/userService";
 
 export default function AdminDashboardPage() {
     const [orders, setOrders] = React.useState<APIOrder[]>([]);
     const [products, setProducts] = React.useState<APIProduct[]>([]);
+    const [users, setUsers] = React.useState<APIUser[]>([]);
     const [isLoading, setIsLoading] = React.useState(true);
+
+    const [weather, setWeather] = React.useState({ condition: "Sunny", advice: "Excellent time for harvesting and drying crops.", temp: 31 });
 
     const fetchData = async () => {
         try {
             setIsLoading(true);
-            const [ordersData, productsData] = await Promise.all([
+            const [ordersData, productsData, usersData] = await Promise.all([
                 getOrders(),
-                getProducts()
+                getProducts(),
+                getUsers()
             ]);
             setOrders(ordersData);
             setProducts(productsData);
+            setUsers(usersData);
+            
+            // Simulate random weather update
+            const weathers = [
+                { condition: "Sunny", advice: "Excellent time for harvesting.", temp: 32 },
+                { condition: "Rainy", advice: "Avoid applying fertilizer today.", temp: 24 },
+                { condition: "Cloudy", advice: "Good weather for weeding.", temp: 28 }
+            ];
+            setWeather(weathers[Math.floor(Math.random() * weathers.length)]);
         } catch (error) {
             console.error("Failed to fetch dashboard data:", error);
         } finally {
@@ -44,19 +60,22 @@ export default function AdminDashboardPage() {
         fetchData();
     }, []);
 
-    const lowStockCount = products.filter(p => p.stockQuantity < p.minThreshold).length;
+    const lowStockCount = products.filter(p => p.stockQuantity < (p.minThreshold || 10)).length;
     const pendingOrdersCount = orders.filter(o => o.status === "pending").length;
-    const transitOrdersCount = orders.filter(o => o.status === "delivery").length;
-    const todayOrdersCount = orders.filter(o => {
-        const today = new Date().toDateString();
-        return new Date(o.createdAt).toDateString() === today;
-    }).length;
+    
+    // Last 24 hours for Today's Orders to be more resilient
+    const last24h = new Date(Date.now() - 24 * 60 * 60 * 1000);
+    const todayOrdersCount = orders.filter(o => new Date(o.createdAt) >= last24h).length;
+    
+    // Active Users (last 30 minutes)
+    const activeThreshold = new Date(Date.now() - 30 * 60 * 1000);
+    const activeUsersCount = users.filter(u => u.lastSeen && new Date(u.lastSeen) >= activeThreshold).length;
 
     const stats = [
-        { label: "Today's Orders", value: todayOrdersCount.toString(), trend: "+12%", icon: TrendingUp, color: "bg-blue-500" },
-        { label: "Low Stock Alerts", value: lowStockCount.toString().padStart(2, "0"), trend: "Warning", icon: AlertTriangle, color: "bg-amber-500" },
-        { label: "Pending Approvals", value: pendingOrdersCount.toString().padStart(2, "0"), trend: "High", icon: Clock, color: "bg-orange-500" },
-        { label: "Deliveries in Transit", value: transitOrdersCount.toString().padStart(2, "0"), trend: "+2 today", icon: Truck, color: "bg-green-500" },
+        { label: "Today's Orders", value: todayOrdersCount.toString(), trend: "+12%", icon: TrendingUp, color: "bg-blue-600", href: "/orders" },
+        { label: "Active Farmers", value: activeUsersCount.toString().padStart(2, "0"), trend: "Now Online", icon: Users, color: "bg-indigo-600", href: "/users" },
+        { label: "Pending Approvals", value: pendingOrdersCount.toString().padStart(2, "0"), trend: "Action required", icon: Clock, color: "bg-orange-500", href: "/orders?status=pending" },
+        { label: "Low Stock Alerts", value: lowStockCount.toString().padStart(2, "0"), trend: "Check Inventory", icon: AlertTriangle, color: "bg-amber-600", href: "/inventory?status=Low Stock" },
     ];
 
     const recentOrders = orders
@@ -84,36 +103,62 @@ export default function AdminDashboardPage() {
                         <h1 className="text-2xl font-bold text-text-primary">Dashboard Overview</h1>
                         <p className="text-text-secondary text-sm sm:text-base">Welcome back, here is what is happening today.</p>
                     </div>
-                    <Button variant="outline" className="w-full sm:w-auto gap-2">
-                        <ArrowUpRight size={18} />
-                        Export Data
-                    </Button>
+                    <Link href="/reports" className="w-full sm:w-auto">
+                        <Button variant="outline" className="w-full gap-2">
+                            <ArrowUpRight size={18} />
+                            Export Data
+                        </Button>
+                    </Link>
                 </div>
 
                 {/* Stats Row */}
                 <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
                     {stats.map((stat, idx) => (
-                        <div key={idx} className="group relative overflow-hidden rounded-2xl bg-white p-6 shadow-sm ring-1 ring-black/5 transition-all hover:shadow-md">
-                            <div className="flex items-center justify-between">
-                                <div className={cn("flex h-12 w-12 items-center justify-center rounded-xl text-white shadow-lg", stat.color)}>
-                                    <stat.icon size={24} />
+                        <Link key={idx} href={stat.href}>
+                            <div className="group relative overflow-hidden rounded-2xl bg-white p-6 shadow-sm ring-1 ring-black/5 transition-all hover:shadow-md hover:-translate-y-1 cursor-pointer">
+                                <div className="flex items-center justify-between">
+                                    <div className={cn("flex h-12 w-12 items-center justify-center rounded-xl text-white shadow-lg transition-transform group-hover:scale-110", stat.color)}>
+                                        <stat.icon size={24} />
+                                    </div>
+                                    <div className="text-right">
+                                        <p className="text-sm font-medium text-text-secondary">{stat.label}</p>
+                                        <p className="text-2xl font-bold text-text-primary">{isLoading ? "..." : stat.value}</p>
+                                    </div>
                                 </div>
-                                <div className="text-right">
-                                    <p className="text-sm font-medium text-text-secondary">{stat.label}</p>
-                                    <p className="text-2xl font-bold text-text-primary">{isLoading ? "..." : stat.value}</p>
+                                <div className="mt-4 flex items-center gap-1 text-xs font-semibold text-green-600">
+                                    <ArrowUpRight size={14} />
+                                    <span>{stat.trend}</span>
+                                    <span className="ml-1 font-normal text-text-secondary">vs yesterday</span>
                                 </div>
                             </div>
-                            <div className="mt-4 flex items-center gap-1 text-xs font-semibold text-green-600">
-                                <ArrowUpRight size={14} />
-                                <span>{stat.trend}</span>
-                                <span className="ml-1 font-normal text-text-secondary">vs yesterday</span>
-                            </div>
-                        </div>
+                        </Link>
                     ))}
                 </div>
 
-                {/* Main Section: Charts Placeholders */}
+                {/* Main Content Grid */}
                 <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+                    {/* Insights & Weather Row */}
+                    <div className="lg:col-span-3 grid grid-cols-1 md:grid-cols-3 gap-6">
+                        <div className="md:col-span-2 rounded-2xl bg-gradient-to-br from-primary to-primary-dark p-6 text-white shadow-lg overflow-hidden relative group">
+                            <div className="relative z-10">
+                                <div className="flex items-center gap-2 mb-4">
+                                    <div className="p-2 bg-white/20 rounded-lg">
+                                        {weather.condition === "Rainy" ? <Truck size={20} /> : <TrendingUp size={20} />}
+                                    </div>
+                                    <span className="font-bold uppercase tracking-wider text-xs opacity-90">Agri Insights • Live</span>
+                                </div>
+                                <h3 className="text-xl font-bold mb-2">Conseil du jour : {weather.advice}</h3>
+                                <p className="text-white/80 text-sm max-w-xl">Basé sur les prévisions météorologiques actuelles ({weather.temp}°C, {weather.condition}) pour votre région.</p>
+                            </div>
+                            {/* Abstract background element */}
+                            <div className="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-white/10 rounded-full blur-3xl group-hover:bg-white/20 transition-colors" />
+                        </div>
+
+                        <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-black/5 border-l-4 border-orange-500">
+                            <h4 className="text-sm font-bold text-text-secondary uppercase tracking-tight mb-2">Recommandation</h4>
+                            <p className="text-text-primary font-medium">Augmentez le stock de **NPK 15-15-15**. La demande projetée est en hausse de 15% pour la semaine prochaine.</p>
+                        </div>
+                    </div>
                     {/* Order Activity Chart */}
                     <div className="lg:col-span-2 rounded-2xl bg-white p-6 shadow-sm ring-1 ring-black/5">
                         <div className="mb-6 flex items-center justify-between">
@@ -175,7 +220,9 @@ export default function AdminDashboardPage() {
                 <div className="rounded-2xl bg-white shadow-sm ring-1 ring-black/5 overflow-hidden">
                     <div className="flex items-center justify-between border-b border-gray-100 px-6 py-4">
                         <h3 className="text-lg font-bold text-text-primary">Recent Orders</h3>
-                        <Button variant="ghost" className="text-sm">View All <ChevronRight size={16} className="ml-1" /></Button>
+                        <Link href="/orders">
+                            <Button variant="ghost" className="text-sm">View All <ChevronRight size={16} className="ml-1" /></Button>
+                        </Link>
                     </div>
                     {isLoading ? (
                         <div className="flex h-48 items-center justify-center">

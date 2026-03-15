@@ -7,25 +7,25 @@ import { cn } from "@/lib/utils";
 
 const translations = {
     en: {
-        help: "Need help? Ask AgroFlow AI",
+        help: "Need help? Ask AgriFlow AI",
         placeholder: "Ask anything...",
         online: "Online",
         common: "Common Queries",
-        assistant: "AgroFlow AI",
-        initialMsg: "Hello! I am your AgroFlow AI assistant. I can help you track inventory, review orders, or generate distribution reports. How can I assist you today?",
-        poweredBy: "Powered by AgroFlow AI Intelligence",
+        assistant: "AgriFlow AI",
+        initialMsg: "Hello! I am your AgriFlow AI assistant. I can help you track inventory, review orders, or generate distribution reports. How can I assist you today?",
+        poweredBy: "Powered by AgriFlow AI Intelligence",
         switch: "Passer au Français",
         recording: "Recording...",
         transcribing: "Transcribing..."
     },
     fr: {
-        help: "Besoin d'aide ? Demandez à AgroFlow AI",
+        help: "Besoin d'aide ? Demandez à AgriFlow AI",
         placeholder: "Posez votre question...",
         online: "En ligne",
         common: "Questions fréquentes",
-        assistant: "AgroFlow AI",
-        initialMsg: "Bonjour ! Je suis votre assistant AgroFlow AI. Je peux vous aider à suivre l'inventaire, examiner les commandes ou générer des rapports de distribution. Comment puis-je vous aider aujourd'hui ?",
-        poweredBy: "Propulsé par l'intelligence AgroFlow AI",
+        assistant: "AgriFlow AI",
+        initialMsg: "Bonjour ! Je suis votre assistant AgriFlow AI. Je peux vous aider à suivre l'inventaire, examiner les commandes ou générer des rapports de distribution. Comment puis-je vous aider aujourd'hui ?",
+        poweredBy: "Propulsé par l'intelligence AgriFlow AI",
         switch: "Switch to English",
         recording: "Enregistrement...",
         transcribing: "Transcription..."
@@ -34,12 +34,13 @@ const translations = {
 
 export function AIAssistant() {
     const [isOpen, setIsOpen] = React.useState(false);
-    const [lang, setLang] = React.useState<"en" | "fr">("en");
+    const [lang, setLang] = React.useState<"en" | "fr">("fr");
     const [attachments, setAttachments] = React.useState<{ type: 'file' | 'image' | 'link', name: string }[]>([]);
     const [isAttachmentMenuOpen, setIsAttachmentMenuOpen] = React.useState(false);
     const [messages, setMessages] = React.useState<any[]>([]);
     const [inputValue, setInputValue] = React.useState("");
     const [isLoading, setIsLoading] = React.useState(false);
+    const [user, setUser] = React.useState<any>(null);
     
     // Voice state
     const [isRecording, setIsRecording] = React.useState(false);
@@ -62,16 +63,24 @@ export function AIAssistant() {
     };
 
     React.useEffect(() => {
+        // Load user
+        try {
+            const { getCurrentUser } = require("@/services/authService");
+            setUser(getCurrentUser());
+        } catch (e) {
+            console.error("Failed to load user in AIAssistant", e);
+        }
+
         // Initial load
         const savedLang = localStorage.getItem("language") as "en" | "fr";
         if (savedLang && (savedLang === "en" || savedLang === "fr")) {
             setLang(savedLang);
         }
         
-        const savedMuted = localStorage.getItem("ai_assistant_muted");
+        const savedMuted = localStorage.getItem("agriflow_ai_assistant_muted");
         if (savedMuted) setIsMuted(savedMuted === "true");
 
-        const savedPos = localStorage.getItem("ai_assistant_pos");
+        const savedPos = localStorage.getItem("agriflow_ai_assistant_pos");
         if (savedPos) {
             try {
                 setPosition(JSON.parse(savedPos));
@@ -80,7 +89,7 @@ export function AIAssistant() {
             }
         }
 
-        const savedMessages = localStorage.getItem("ai_assistant_messages");
+        const savedMessages = localStorage.getItem("agriflow_ai_assistant_messages");
         if (savedMessages) {
             try {
                 setMessages(JSON.parse(savedMessages));
@@ -97,7 +106,7 @@ export function AIAssistant() {
         scrollToBottom();
         // Save messages on update (but only if we have any)
         if (messages.length > 0) {
-            localStorage.setItem("ai_assistant_messages", JSON.stringify(messages));
+            localStorage.setItem("agriflow_ai_assistant_messages", JSON.stringify(messages));
         }
     }, [messages]);
 
@@ -115,7 +124,7 @@ export function AIAssistant() {
     const toggleMute = () => {
         const newMuted = !isMuted;
         setIsMuted(newMuted);
-        localStorage.setItem("ai_assistant_muted", String(newMuted));
+        localStorage.setItem("agriflow_ai_assistant_muted", String(newMuted));
         if (newMuted) window.speechSynthesis.cancel();
     };
 
@@ -286,12 +295,12 @@ export function AIAssistant() {
     const suggestions = lang === "en" ? [
         "Review pending orders",
         "Check stock levels",
-        "Regional distribution trends",
+        "Country distribution trends",
         "Generate weekly report"
     ] : [
         "Examiner les commandes en attente",
         "Vérifier les niveaux de stock",
-        "Tendances de distribution régionale",
+        "Tendances de distribution par pays",
         "Générer le rapport hebdomadaire"
     ];
 
@@ -349,10 +358,22 @@ export function AIAssistant() {
                                 msg.role === "user" ? "flex-row-reverse" : "flex-row"
                             )}>
                                 <div className={cn(
-                                    "flex h-8 w-8 shrink-0 items-center justify-center rounded-full shadow-sm border",
+                                    "flex h-8 w-8 shrink-0 items-center justify-center rounded-full shadow-sm border overflow-hidden",
                                     msg.role === "assistant" ? "bg-primary text-white border-primary" : "bg-white text-text-secondary border-gray-200"
                                 )}>
-                                    {msg.role === "assistant" ? <Sparkles size={14} /> : <User size={14} />}
+                                    {msg.role === "assistant" ? (
+                                        <Sparkles size={14} />
+                                    ) : (
+                                        user?.avatar ? (
+                                            <img 
+                                                src={user.avatar.startsWith('http') ? user.avatar : `${process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'http://localhost:5000'}${user.avatar}`} 
+                                                alt={user.name} 
+                                                className="h-full w-full object-cover"
+                                            />
+                                        ) : (
+                                            <User size={14} />
+                                        )
+                                    )}
                                 </div>
                                 <div className={cn(
                                     "rounded-2xl p-3 text-sm shadow-sm max-w-[80%]",
@@ -461,29 +482,40 @@ export function AIAssistant() {
                                 {/* Attachment Menu */}
                                 {isAttachmentMenuOpen && (
                                     <div className="absolute bottom-full mb-4 left-0 w-44 bg-white rounded-2xl shadow-2xl border border-gray-100 p-2 animate-in fade-in slide-in-from-bottom-4 duration-300 z-20">
-                                        <button 
-                                            onClick={() => {
-                                                setAttachments(prev => [...prev, { type: 'file', name: 'Invoice.pdf' }]);
+                                        <input 
+                                            type="file" 
+                                            id="ai-file-upload" 
+                                            className="hidden" 
+                                            onChange={async (e) => {
+                                                const file = e.target.files?.[0];
+                                                if (file) {
+                                                    const formData = new FormData();
+                                                    formData.append('file', file);
+                                                    try {
+                                                        const api = (await import("@/services/api")).default;
+                                                        const response = await api.post('/upload/ai', formData, {
+                                                            headers: { 'Content-Type': 'multipart/form-data' }
+                                                        });
+                                                        setAttachments(prev => [...prev, { 
+                                                            type: response.data.type, 
+                                                            name: response.data.name,
+                                                            url: response.data.url 
+                                                        }]);
+                                                    } catch (err) {
+                                                        console.error("AI upload failed:", err);
+                                                    }
+                                                }
                                                 setIsAttachmentMenuOpen(false);
                                             }}
+                                        />
+                                        <button 
+                                            onClick={() => document.getElementById('ai-file-upload')?.click()}
                                             className="w-full flex items-center gap-3 p-2 rounded-xl hover:bg-background-alt text-text-primary transition-all group"
                                         >
                                             <div className="h-7 w-7 flex items-center justify-center rounded-lg bg-blue-50 text-blue-500 group-hover:bg-blue-500 group-hover:text-white transition-all">
                                                 <FileText size={14} />
                                             </div>
-                                            <span className="text-[11px] font-bold">File</span>
-                                        </button>
-                                        <button 
-                                            onClick={() => {
-                                                setAttachments(prev => [...prev, { type: 'image', name: 'Photo.jpg' }]);
-                                                setIsAttachmentMenuOpen(false);
-                                            }}
-                                            className="w-full flex items-center gap-3 p-2 rounded-xl hover:bg-background-alt text-text-primary transition-all group"
-                                        >
-                                            <div className="h-7 w-7 flex items-center justify-center rounded-lg bg-green-50 text-green-500 group-hover:bg-green-500 group-hover:text-white transition-all">
-                                                <Camera size={14} />
-                                            </div>
-                                            <span className="text-[11px] font-bold">Photo</span>
+                                            <span className="text-[11px] font-bold">File / Photo</span>
                                         </button>
                                         <button 
                                             onClick={() => {
@@ -572,7 +604,7 @@ export function AIAssistant() {
                 {!isOpen && (
                     <div className="ml-3 sm:block hidden">
                         <p className="text-[10px] font-bold uppercase tracking-wider opacity-70 leading-none mb-0.5">{lang === 'en' ? 'Need help?' : "Besoin d'aide ?"}</p>
-                        <p className="text-sm font-extrabold whitespace-nowrap leading-none">{lang === 'en' ? 'Ask AgroFlow AI' : 'Demander à AgroFlow IA'}</p>
+                        <p className="text-sm font-extrabold whitespace-nowrap leading-none">{lang === 'en' ? 'Ask AgriFlow AI' : 'Demander à AgriFlow IA'}</p>
                     </div>
                 )}
             </div>

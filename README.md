@@ -48,9 +48,9 @@ The ecosystem consists of three main components:
 
 ## 📦 Repositories
 
-- **Main Ecosystem**: [https://github.com/AgriFlow-BIT-Group14/AgriFlow](https://github.com/AgriFlow-BIT-Group14/AgriFlow)
-- **Backend API**: [https://github.com/AgriFlow-BIT-Group14/AgriFlow_backend](https://github.com/AgriFlow-BIT-Group14/AgriFlow_backend)
-- **Mobile App**: [https://github.com/AgriFlow-BIT-Group14/AgriFlow_mobile](https://github.com/AgriFlow-BIT-Group14/AgriFlow_mobile)
+- **Main Ecosystem**: [https://github.com/AgriFlow-BIT-Group18/AgriFlow](https://github.com/AgriFlow-BIT-Group18/AgriFlow)
+- **Backend API**: [https://github.com/AgriFlow-BIT-Group18/AgriFlow_backend](https://github.com/AgriFlow-BIT-Group18/AgriFlow_backend)
+- **Mobile App**: [https://github.com/AgriFlow-BIT-Group18/AgriFlow_mobile](https://github.com/AgriFlow-BIT-Group18/AgriFlow_mobile)
 
 ---
 

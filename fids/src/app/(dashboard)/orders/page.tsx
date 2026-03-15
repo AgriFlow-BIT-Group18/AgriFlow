@@ -40,6 +40,12 @@ export default function OrdersPage() {
     };
 
     React.useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        const statusParam = params.get("status");
+        if (statusParam) {
+            setActiveTab(statusParam);
+        }
+        
         setUser(getCurrentUser());
         fetchOrders();
     }, []);
@@ -130,10 +136,11 @@ export default function OrdersPage() {
                             <div className="flex-1 sm:flex-none flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 text-text-secondary">
                                 <MapPin size={16} />
                                 <select className="bg-transparent text-sm font-medium outline-none h-10 w-full sm:w-32 cursor-pointer">
-                                    <option>All Regions</option>
-                                    <option>Dakar</option>
-                                    <option>Thiès</option>
-                                    <option>Saint-Louis</option>
+                                    <option>All Countries</option>
+                                    <option>Burkina Faso</option>
+                                    <option>Sénégal</option>
+                                    <option>Côte d'Ivoire</option>
+                                    <option>Mali</option>
                                 </select>
                             </div>
                             <div className="flex-1 sm:flex-none flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-3 text-text-secondary whitespace-nowrap">
@@ -214,7 +221,7 @@ export default function OrdersPage() {
                                             </div>
                                             <div>
                                                 <p className="font-semibold text-text-primary">{item.user.name}</p>
-                                                <Badge status="approved" className="mt-0.5 h-4 px-1.5 text-[9px] uppercase tracking-wider">{item.user.region || "Dakar"}</Badge>
+                                                <Badge status="approved" className="mt-0.5 h-4 px-1.5 text-[9px] uppercase tracking-wider">{item.user.region || "Burkina Faso"}</Badge>
                                             </div>
                                         </div>
                                     )
@@ -222,17 +229,20 @@ export default function OrdersPage() {
                                 {
                                     header: "Products",
                                     accessor: (item: APIOrder) => item.orderItems.map(i => i.name).join(", "),
-                                    className: "max-w-[200px] truncate"
+                                    className: "max-w-[200px] truncate",
+                                    hiddenOnMobile: true
                                 },
                                 {
                                     header: "Qty",
                                     accessor: (item: APIOrder) => item.orderItems.reduce((acc, i) => acc + i.qty, 0).toString(),
-                                    className: "text-text-secondary font-medium"
+                                    className: "text-text-secondary font-medium",
+                                    hiddenOnMobile: true
                                 },
                                 {
                                     header: "Date",
                                     accessor: (item: APIOrder) => new Date(item.createdAt).toLocaleDateString(),
-                                    className: "text-text-secondary"
+                                    className: "text-text-secondary",
+                                    hiddenOnMobile: true
                                 },
                                 {
                                     header: "Status",
@@ -295,7 +305,7 @@ export default function OrdersPage() {
                                     <div>
                                         <h3 className="text-xl font-bold text-text-primary">{selectedOrder.user?.name || "Unknown User"}</h3>
                                         <div className="mt-1 flex items-center gap-3 text-sm text-text-secondary">
-                                            <span className="flex items-center gap-1"><MapPin size={14} /> {selectedOrder.user?.region || "Dakar"}</span>
+                                            <span className="flex items-center gap-1"><MapPin size={14} /> {selectedOrder.user?.region || "Burkina Faso"}</span>
                                             <span className="flex items-center gap-1 font-mono">#{selectedOrder._id?.slice(-8).toUpperCase()}</span>
                                         </div>
                                     </div>

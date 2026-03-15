@@ -37,7 +37,7 @@ const Sidebar: React.FC<SidebarProps> = ({ role, pendingOrdersCount = 0, isOpen 
         { name: "Inventory", href: "/inventory", icon: Box, roles: ["admin", "distributor"] },
         { name: "Orders", href: "/orders", icon: ClipboardList, roles: ["admin", "distributor"], badge: pendingOrdersCount },
         { name: "Deliveries", href: "/deliveries", icon: Truck, roles: ["admin", "distributor"] },
-        { name: "AgroFlow AI", href: "/ai", icon: Sparkles, roles: ["admin", "distributor"] },
+        { name: "AgriFlow AI", href: "/ai", icon: Sparkles, roles: ["admin", "distributor"] },
         { name: "Reports", href: "/reports", icon: BarChart3, roles: ["admin", "distributor"] },
         { name: "Users", href: "/users", icon: Users, roles: ["admin", "distributor"] },
     ];
@@ -63,7 +63,7 @@ const Sidebar: React.FC<SidebarProps> = ({ role, pendingOrdersCount = 0, isOpen 
                     <Leaf className="text-sidebar fill-current" size={24} />
                 </div>
                 <div className="flex flex-col">
-                    <span className="text-xl font-bold tracking-tight">AgroFlow</span>
+                    <span className="text-xl font-bold tracking-tight">AgriFlow</span>
                 </div>
             </div>
 

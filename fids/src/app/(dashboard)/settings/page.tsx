@@ -52,7 +52,12 @@ export default function SettingsPage() {
             localStorage.setItem('user', JSON.stringify(newUser));
             setUser(newUser);
             
-            setSaveMessage({ type: 'success', text: "Profile updated successfully!" });
+            setSaveMessage({ type: 'success', text: "Profile updated successfully! Refreshing..." });
+            
+            // Force reload to sync Header/Sidebar in parent Layout
+            setTimeout(() => {
+                window.location.reload();
+            }, 1000);
         } catch (err) {
             console.error(err);
             setSaveMessage({ type: 'error', text: "Failed to update profile. Please try again." });
@@ -92,7 +97,7 @@ export default function SettingsPage() {
         { id: "profile", label: "Account Profile", icon: User },
         { id: "security", label: "Security & Password", icon: Lock },
         { id: "notifications", label: "Notifications", icon: Bell },
-        { id: "regional", label: "Regional Zones", icon: MapPin },
+        { id: "regional", label: "Country Zones", icon: MapPin },
     ];
 
     return (
@@ -114,8 +119,8 @@ export default function SettingsPage() {
 
                 <div className="flex flex-col gap-8 lg:flex-row">
                     {/* Navigation Sidebar */}
-                    <div className="w-full lg:w-64 shrink-0">
-                        <div className="flex flex-col gap-1 rounded-2xl bg-white p-2 shadow-sm ring-1 ring-black/5">
+                    <div className="w-full lg:w-64 shrink-0 overflow-x-hidden">
+                        <div className="flex flex-row lg:flex-col gap-1 rounded-2xl bg-white p-2 shadow-sm ring-1 ring-black/5 overflow-x-auto no-scrollbar">
                             {tabs.map((tab) => (
                                 <button
                                     key={tab.id}
@@ -124,13 +129,13 @@ export default function SettingsPage() {
                                         setSaveMessage(null);
                                     }}
                                     className={cn(
-                                        "flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-bold transition-all",
+                                        "flex items-center gap-2 sm:gap-3 rounded-xl px-4 py-3 text-sm font-bold transition-all whitespace-nowrap",
                                         activeTab === tab.id
                                             ? "bg-primary text-white shadow-lg shadow-primary/20"
                                             : "text-text-secondary hover:bg-background-alt hover:text-text-primary"
                                     )}
                                 >
-                                    <tab.icon size={18} />
+                                    <tab.icon size={18} className="shrink-0" />
                                     {tab.label}
                                 </button>
                             ))}
@@ -138,13 +143,22 @@ export default function SettingsPage() {
                     </div>
 
                     {/* Settings Content */}
-                    <div className="flex-1 rounded-3xl bg-white p-8 shadow-sm ring-1 ring-black/5">
+                    <div className="flex-1 rounded-3xl bg-white p-4 sm:p-8 shadow-sm ring-1 ring-black/5">
                         {activeTab === "profile" && (
                             <form className="space-y-8 animate-in fade-in duration-500" onSubmit={handleSaveProfile}>
                                 <div className="flex flex-col gap-6 sm:flex-row sm:items-center">
                                     <div className="relative group">
-                                        <div className="flex h-24 w-24 items-center justify-center rounded-full bg-primary/10 text-primary text-3xl font-bold border-4 border-white shadow-xl ring-1 ring-gray-100">
-                                            {name ? name.charAt(0).toUpperCase() : "U"}
+                                        <div className="flex h-24 w-24 items-center justify-center rounded-full bg-primary/10 text-primary text-3xl font-bold border-4 border-white shadow-xl ring-1 ring-gray-100 overflow-hidden">
+                                            {user?.avatar ? (
+                                                <img 
+                                                    src={user.avatar.startsWith('http') ? user.avatar : `${process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'http://localhost:5000'}${user.avatar}`} 
+                                                    alt={name} 
+                                                    className="h-full w-full object-cover"
+                                                    key={user.avatar} // Force re-render if URL changes
+                                                />
+                                            ) : (
+                                                name ? name.charAt(0).toUpperCase() : "U"
+                                            )}
                                         </div>
                                         <button type="button" className="absolute -bottom-1 -right-1 flex h-8 w-8 items-center justify-center rounded-full bg-white text-text-secondary shadow-lg border border-gray-100 hover:text-primary transition-all">
                                             <Globe size={14} />
@@ -152,17 +166,36 @@ export default function SettingsPage() {
                                     </div>
                                     <div>
                                         <h3 className="text-lg font-bold text-text-primary">Profile Picture</h3>
-                                        <p className="text-sm text-text-secondary">JPG, GIF or PNG. Max size of 800K.</p>
+                                        <p className="text-sm text-text-secondary">JPG, GIF or PNG. Max size of 5MB.</p>
                                         <div className="mt-3 flex gap-2">
                                             <input
                                                 type="file"
                                                 ref={fileInputRef}
                                                 className="hidden"
                                                 accept="image/*"
-                                                onChange={(e) => {
+                                                onChange={async (e) => {
                                                     const file = e.target.files?.[0];
                                                     if (file) {
-                                                        console.log("Selected file:", file.name);
+                                                        const formData = new FormData();
+                                                        formData.append('image', file);
+                                                        
+                                                        try {
+                                                            setIsSaving(true);
+                                                            const api = (await import("@/services/api")).default;
+                                                            const response = await api.post('/upload/avatar', formData, {
+                                                                headers: { 'Content-Type': 'multipart/form-data' }
+                                                            });
+                                                            
+                                                            const newUser = { ...user, avatar: response.data.avatar };
+                                                            localStorage.setItem('user', JSON.stringify(newUser));
+                                                            setUser(newUser);
+                                                            setSaveMessage({ type: 'success', text: "Avatar updated successfully!" });
+                                                        } catch (err) {
+                                                            console.error(err);
+                                                            setSaveMessage({ type: 'error', text: "Failed to upload avatar." });
+                                                        } finally {
+                                                            setIsSaving(false);
+                                                        }
                                                     }
                                                 }}
                                             />
@@ -241,7 +274,7 @@ export default function SettingsPage() {
                                 <div className="space-y-4">
                                     {[
                                         { icon: Bell, label: "Order Status Updates", desc: "Receive alerts when an order is approved, rejected or delivered.", default: true },
-                                        { icon: MapPin, label: "Zone Alerts", desc: "Notifications about stock movements and distributor activities in your zone.", default: true },
+                                        { icon: MapPin, label: "Country Alerts", desc: "Notifications about stock movements and distributor activities in your country.", default: true },
                                         { icon: Shield, label: "Security & Login", desc: "Notifications about new logins and security changes.", default: false },
                                     ].map((item, i) => (
                                         <div key={i} className="flex items-start justify-between rounded-2xl border border-gray-100 p-6 transition-all hover:bg-background-alt">
@@ -279,8 +312,8 @@ export default function SettingsPage() {
                             <div className="space-y-6 animate-in fade-in duration-500">
                                 <div className="flex items-center justify-between">
                                     <div>
-                                        <h3 className="text-lg font-bold text-text-primary">Regional Assignment</h3>
-                                        <p className="text-sm text-text-secondary">Your assigned operational zone for distribution.</p>
+                                        <h3 className="text-lg font-bold text-text-primary">Country Assignment</h3>
+                                        <p className="text-sm text-text-secondary">Your assigned operational country for distribution.</p>
                                     </div>
                                     <Badge status="approved">Active Zone</Badge>
                                 </div>
@@ -290,8 +323,8 @@ export default function SettingsPage() {
                                         <MapPin size={32} />
                                     </div>
                                     <div>
-                                        <h4 className="text-2xl font-extrabold text-text-primary">Dakar Metropolitan</h4>
-                                        <p className="text-sm font-semibold text-primary">Assigned Zone ID: ZONE-SN-DKR-01</p>
+                                        <h4 className="text-2xl font-extrabold text-text-primary">Burkina Faso</h4>
+                                        <p className="text-sm font-semibold text-primary">Assigned Country ID: BF-OUA-01</p>
                                     </div>
                                     <div className="flex gap-4 text-xs font-bold text-text-secondary uppercase tracking-widest mt-2">
                                         <span>325 Farmers</span>
@@ -301,7 +334,7 @@ export default function SettingsPage() {
                                 </div>
 
                                 <div className="rounded-xl border border-gray-100 p-6 flex items-center justify-between text-sm">
-                                    <p className="text-text-secondary">Need to change your assigned region?</p>
+                                    <p className="text-text-secondary">Need to change your assigned country?</p>
                                     <Button variant="outline" size="sm">Request Transfer</Button>
                                 </div>
                             </div>

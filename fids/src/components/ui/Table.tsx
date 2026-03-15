@@ -7,6 +7,7 @@ export interface Column<T> {
     accessor: keyof T | ((item: T) => React.ReactNode);
     sortable?: boolean;
     className?: string;
+    hiddenOnMobile?: boolean;
 }
 
 export interface TableProps<T> {
@@ -61,6 +62,7 @@ const Table = <T extends Record<string, unknown>>({
                                     className={cn(
                                         "px-6 py-4 text-xs font-semibold uppercase tracking-wider text-text-secondary select-none",
                                         column.sortable && "cursor-pointer hover:text-primary transition-colors",
+                                        column.hiddenOnMobile && "hidden md:table-cell",
                                         column.className
                                     )}
                                 >
@@ -112,6 +114,7 @@ const Table = <T extends Record<string, unknown>>({
                                             key={colIdx}
                                             className={cn(
                                                 "px-6 py-4 text-sm text-text-primary whitespace-nowrap",
+                                                column.hiddenOnMobile && "hidden md:table-cell",
                                                 column.className
                                             )}
                                         >

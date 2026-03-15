@@ -5,6 +5,7 @@ export interface AuthResponse {
     name: string;
     email: string;
     role: string;
+    avatar?: string;
     token: string;
 }
 

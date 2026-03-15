@@ -69,7 +69,7 @@ export default function AIPage() {
 
     // Persistence: Load
     React.useEffect(() => {
-        const key = `agroflow_ai_messages_${persona}`;
+        const key = `agriflow_ai_messages_${persona}`;
         const saved = localStorage.getItem(key);
         if (saved) {
             try {
@@ -92,7 +92,7 @@ export default function AIPage() {
     // Persistence: Save
     React.useEffect(() => {
         if (messages.length > 0) {
-            const key = `agroflow_ai_messages_${persona}`;
+            const key = `agriflow_ai_messages_${persona}`;
             localStorage.setItem(key, JSON.stringify(messages));
         }
     }, [messages, persona]);
@@ -158,7 +158,7 @@ export default function AIPage() {
 
     const clearHistory = () => {
         if (confirm(`Are you sure you want to clear your conversation history with ${activePersona.name}?`)) {
-            const key = `agroflow_ai_messages_${persona}`;
+            const key = `agriflow_ai_messages_${persona}`;
             localStorage.removeItem(key);
             setMessages([
                 {

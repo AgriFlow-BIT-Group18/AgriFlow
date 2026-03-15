@@ -53,10 +53,16 @@ export default function DashboardLayout({
             {/* Main Content Area */}
             <main className="ml-0 lg:ml-64 w-full flex min-h-screen flex-1 flex-col transition-all">
                 {/* Sticky Header */}
-                <Header userName={user.name} role={displayRole} notificationCount={pendingCount} onMenuToggle={() => setIsMobileMenuOpen(!isMobileMenuOpen)} />
+                <Header 
+                    userName={user.name} 
+                    role={displayRole} 
+                    avatar={user.avatar}
+                    notificationCount={pendingCount} 
+                    onMenuToggle={() => setIsMobileMenuOpen(!isMobileMenuOpen)} 
+                />
 
                 {/* Page Content */}
-                <div className="flex-1 p-4 sm:p-6 lg:p-8 overflow-x-hidden w-full">
+                <div className="flex-1 p-3 sm:p-6 lg:p-8 overflow-x-hidden w-full">
                     <div className="mx-auto w-full max-w-7xl">
                         {children}
                     </div>

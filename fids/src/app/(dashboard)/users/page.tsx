@@ -23,13 +23,13 @@ export default function UserManagementPage() {
     const [searchQuery, setSearchQuery] = React.useState("");
 
     const [editingUser, setEditingUser] = React.useState<APIUser | null>(null);
-    const [selectedRegion, setSelectedRegion] = React.useState("All Regions");
+    const [selectedCountry, setSelectedCountry] = React.useState("All Countries");
     const [selectedStatus, setSelectedStatus] = React.useState("Status: All");
 
     const [newUserName, setNewUserName] = React.useState("");
-    const [newUserEmail, setNewUserEmail] = React.useState("");
+    const [newUserEmail, setNewUserEmail] = React.useState(""); // Kept this line to maintain syntactic correctness
     const [newUserRole, setNewUserRole] = React.useState<"admin" | "distributor" | "farmer">("admin");
-    const [newUserRegion, setNewUserRegion] = React.useState("Dakar");
+    const [newUserCountry, setNewUserCountry] = React.useState("Burkina Faso");
     const [newUserPhone, setNewUserPhone] = React.useState("");
     const [isCreating, setIsCreating] = React.useState(false);
     const [createError, setCreateError] = React.useState<string | null>(null);
@@ -45,7 +45,7 @@ export default function UserManagementPage() {
                     name: newUserName,
                     email: newUserEmail,
                     role: newUserRole,
-                    region: newUserRegion,
+                    region: newUserCountry,
                     phone: newUserPhone
                 });
             } else {
@@ -54,7 +54,7 @@ export default function UserManagementPage() {
                     email: newUserEmail,
                     password: "password123",
                     role: newUserRole,
-                    region: newUserRegion,
+                    region: newUserCountry,
                     phone: newUserPhone
                 });
             }
@@ -76,7 +76,7 @@ export default function UserManagementPage() {
         setNewUserEmail("");
         setNewUserPhone("");
         setNewUserRole("admin");
-        setNewUserRegion("Dakar");
+        setNewUserCountry("Burkina Faso");
     };
 
     const openEditModal = (user: APIUser) => {
@@ -84,7 +84,7 @@ export default function UserManagementPage() {
         setNewUserName(user.name);
         setNewUserEmail(user.email);
         setNewUserRole(user.role as any);
-        setNewUserRegion(user.region || "Dakar");
+        setNewUserCountry(user.region || "Burkina Faso");
         setNewUserPhone(user.phone || "");
         setIsModalOpen(true);
     };
@@ -142,7 +142,7 @@ export default function UserManagementPage() {
             user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
             (user.phone && user.phone.includes(searchQuery));
         
-        const matchesRegion = selectedRegion === "All Regions" || user.region === selectedRegion;
+        const matchesRegion = selectedCountry === "All Countries" || user.region === selectedCountry;
         const matchesStatus = selectedStatus === "Status: All" || 
             (selectedStatus === "Active" && user.status === "active") ||
             (selectedStatus === "Inactive" && user.status === "inactive");
@@ -154,13 +154,13 @@ export default function UserManagementPage() {
         <DashboardLayout>
             <div className="flex flex-col gap-6">
                 {/* Header */}
-                <div className="flex items-end justify-between">
+                <div className="flex flex-col sm:flex-row items-start sm:items-end justify-between gap-4">
                     <div>
                         <h1 className="text-2xl font-bold text-text-primary">User Management</h1>
-                        <p className="text-text-secondary">Control system access and manage regional zone assignments.</p>
+                        <p className="text-text-secondary text-sm sm:text-base">Control system access and manage country zone assignments.</p>
                     </div>
                     {user?.role === 'admin' && (
-                        <Button onClick={() => setIsModalOpen(true)} className="gap-2 shadow-lg shadow-primary/20">
+                        <Button onClick={() => setIsModalOpen(true)} className="gap-2 w-full sm:w-auto shadow-lg shadow-primary/20">
                             <UserPlus size={18} />
                             Add New User
                         </Button>
@@ -169,13 +169,13 @@ export default function UserManagementPage() {
 
                 {/* Tabs & Search */}
                 <div className="flex flex-col gap-6 rounded-2xl bg-white p-6 shadow-sm ring-1 ring-black/5">
-                    <div className="flex items-center gap-1 border-b border-gray-100 pb-0">
+                    <div className="flex items-center gap-1 border-b border-gray-100 pb-0 overflow-x-auto no-scrollbar">
                         {tabs.map((tab) => (
                             <button
                                 key={tab.id}
                                 onClick={() => setActiveTab(tab.id)}
                                 className={cn(
-                                    "px-6 py-4 text-sm font-bold transition-all",
+                                    "px-4 sm:px-6 py-4 text-sm font-bold transition-all whitespace-nowrap",
                                     activeTab === tab.id
                                         ? "text-primary border-b-2 border-primary"
                                         : "text-text-secondary hover:text-text-primary"
@@ -198,15 +198,19 @@ export default function UserManagementPage() {
                         </div>
                         <div className="flex gap-2">
                             <select 
-                                value={selectedRegion}
-                                onChange={(e) => setSelectedRegion(e.target.value)}
+                                value={selectedCountry}
+                                onChange={(e) => setSelectedCountry(e.target.value)}
                                 className="h-10 rounded-lg border border-gray-200 bg-white px-4 text-sm font-bold text-text-secondary outline-none focus:ring-1 focus:ring-primary"
                             >
-                                <option>All Regions</option>
-                                <option>Dakar</option>
-                                <option>Thiès</option>
-                                <option>Saint-Louis</option>
-                                <option>Kaolack</option>
+                                <option>All Countries</option>
+                                <option>Burkina Faso</option>
+                                <option>Sénégal</option>
+                                <option>Côte d'Ivoire</option>
+                                <option>Mali</option>
+                                <option>Ghana</option>
+                                <option>Bénin</option>
+                                <option>Nigéria</option>
+                                <option>Togo</option>
                             </select>
                             <select 
                                 value={selectedStatus}
@@ -263,10 +267,11 @@ export default function UserManagementPage() {
                                             )} />
                                             <span className="text-xs font-bold uppercase tracking-widest text-text-secondary">{item.role}</span>
                                         </div>
-                                    )
+                                    ),
+                                    hiddenOnMobile: true
                                 },
-                                { header: "Region", accessor: (item: APIUser) => item.region || "N/A", className: "text-text-secondary font-medium" },
-                                { header: "Phone", accessor: (item: APIUser) => item.phone || "N/A", className: "text-text-secondary tabular-nums" },
+                                { header: "Country", accessor: (item: APIUser) => item.region || "N/A", className: "text-text-secondary font-medium", hiddenOnMobile: true },
+                                { header: "Phone", accessor: (item: APIUser) => item.phone || "N/A", className: "text-text-secondary tabular-nums", hiddenOnMobile: true },
                                 {
                                     header: "Status",
                                     accessor: (item: APIUser) => (
@@ -323,7 +328,7 @@ export default function UserManagementPage() {
                     title={editingUser ? "Edit Team Member" : "Add New Team Member"}
                 >
                     <form className="space-y-4 py-2" onSubmit={handleCreateUser}>
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <Input
                                 label="Full Name*"
                                 placeholder="e.g. Jean Dupont"
@@ -342,7 +347,7 @@ export default function UserManagementPage() {
                                 onChange={(e) => setNewUserEmail(e.target.value)}
                             />
                         </div>
-                        <div className="grid grid-cols-2 gap-4">
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div className="space-y-1.5">
                                 <label className="text-sm font-bold text-text-primary">Role*</label>
                                 <select
@@ -355,17 +360,21 @@ export default function UserManagementPage() {
                                     <option value="farmer">Farmer</option>
                                 </select>
                             </div>
-                            <div className="space-y-1.5">
-                                <label className="text-sm font-bold text-text-primary">Zone/Region*</label>
+                             <div className="space-y-1.5">
+                                <label className="text-sm font-bold text-text-primary">Country*</label>
                                 <select
                                     className="h-10 w-full rounded-md border border-gray-300 bg-white px-3 text-sm outline-none focus:ring-2 focus:ring-primary cursor-pointer"
-                                    value={newUserRegion}
-                                    onChange={(e) => setNewUserRegion(e.target.value)}
+                                    value={newUserCountry}
+                                    onChange={(e) => setNewUserCountry(e.target.value)}
                                 >
-                                    <option value="Dakar">Dakar</option>
-                                    <option value="Thiès">Thiès</option>
-                                    <option value="Saint-Louis">Saint-Louis</option>
-                                    <option value="Kaolack">Kaolack</option>
+                                    <option value="Burkina Faso">Burkina Faso</option>
+                                    <option value="Sénégal">Sénégal</option>
+                                    <option value="Côte d'Ivoire">Côte d'Ivoire</option>
+                                    <option value="Mali">Mali</option>
+                                    <option value="Ghana">Ghana</option>
+                                    <option value="Bénin">Bénin</option>
+                                    <option value="Nigéria">Nigéria</option>
+                                    <option value="Togo">Togo</option>
                                 </select>
                             </div>
                         </div>
