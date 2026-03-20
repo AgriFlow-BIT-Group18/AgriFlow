@@ -8,7 +8,7 @@ export interface KPI {
     positive: boolean;
 }
 
-export interface RegionalStat {
+export interface CountryStat {
     name: string;
     value: string;
     pct: number;
@@ -17,7 +17,7 @@ export interface RegionalStat {
 export interface Transaction {
     id: string;
     farmer: string;
-    region: string;
+    country: string;
     amount: string;
     date: string;
     status: string;
@@ -25,7 +25,7 @@ export interface Transaction {
 
 export interface AnalyticsData {
     kpis: KPI[];
-    regionalPerformance: RegionalStat[];
+    countryPerformance: CountryStat[];
     monthlyTrend: number[];
     recentTransactions: Transaction[];
 }

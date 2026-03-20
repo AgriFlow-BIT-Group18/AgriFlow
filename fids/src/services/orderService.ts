@@ -13,7 +13,7 @@ export interface Order {
     user: {
         _id: string;
         name: string;
-        region?: string;
+        country?: string;
     };
     orderItems: OrderItem[];
     shippingAddress: {

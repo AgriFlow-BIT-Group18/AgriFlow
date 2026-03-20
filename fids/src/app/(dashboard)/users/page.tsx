@@ -47,7 +47,7 @@ export default function UserManagementPage() {
                     name: newUserName,
                     email: newUserEmail,
                     role: newUserRole,
-                    region: newUserCountry,
+                    country: newUserCountry,
                     phone: newUserPhone
                 });
             } else {
@@ -56,7 +56,7 @@ export default function UserManagementPage() {
                     email: newUserEmail,
                     password: "password123",
                     role: newUserRole,
-                    region: newUserCountry,
+                    country: newUserCountry,
                     phone: newUserPhone
                 });
             }
@@ -86,7 +86,7 @@ export default function UserManagementPage() {
         setNewUserName(user.name);
         setNewUserEmail(user.email);
         setNewUserRole(user.role as any);
-        setNewUserCountry(user.region || "Burkina Faso");
+        setNewUserCountry(user.country || "Burkina Faso");
         setNewUserPhone(user.phone || "");
         setIsModalOpen(true);
     };
@@ -144,7 +144,7 @@ export default function UserManagementPage() {
             user.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
             (user.phone && user.phone.includes(searchQuery));
         
-        const matchesRegion = selectedCountry === "All Countries" || user.region === selectedCountry;
+        const matchesRegion = selectedCountry === "All Countries" || user.country === selectedCountry;
         const matchesStatus = selectedStatus === "Status: All" || 
             (selectedStatus === "Active" && user.status === "active") ||
             (selectedStatus === "Inactive" && user.status === "inactive");
@@ -209,6 +209,7 @@ export default function UserManagementPage() {
                                 <option>Sénégal</option>
                                 <option>Côte d'Ivoire</option>
                                 <option>Mali</option>
+                                <option>Gabon</option>
                                 <option>Ghana</option>
                                 <option>Bénin</option>
                                 <option>Nigéria</option>
@@ -272,7 +273,7 @@ export default function UserManagementPage() {
                                     ),
                                     hiddenOnMobile: true
                                 },
-                                { header: t('country_zones').split(' ')[0], accessor: (item: APIUser) => item.region || "N/A", className: "text-text-secondary font-medium", hiddenOnMobile: true },
+                                { header: t('country_zones').split(' ')[0], accessor: (item: APIUser) => item.country || "N/A", className: "text-text-secondary font-medium", hiddenOnMobile: true },
                                 { header: t('phone'), accessor: (item: APIUser) => item.phone || "N/A", className: "text-text-secondary tabular-nums", hiddenOnMobile: true },
                                 {
                                     header: t('status'), 
@@ -373,6 +374,7 @@ export default function UserManagementPage() {
                                     <option value="Sénégal">Sénégal</option>
                                     <option value="Côte d'Ivoire">Côte d'Ivoire</option>
                                     <option value="Mali">Mali</option>
+                                    <option value="Gabon">Gabon</option>
                                     <option value="Ghana">Ghana</option>
                                     <option value="Bénin">Bénin</option>
                                     <option value="Nigéria">Nigéria</option>

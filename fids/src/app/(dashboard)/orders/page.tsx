@@ -223,7 +223,7 @@ export default function OrdersPage() {
                                             </div>
                                             <div>
                                                 <p className="font-semibold text-text-primary">{item.user.name}</p>
-                                                <Badge status="approved" className="mt-0.5 h-4 px-1.5 text-[9px] uppercase tracking-wider">{item.user.region || "Burkina Faso"}</Badge>
+                                                <Badge status="approved" className="mt-0.5 h-4 px-1.5 text-[9px] uppercase tracking-wider">{item.user.country || "Burkina Faso"}</Badge>
                                             </div>
                                         </div>
                                     )
@@ -307,7 +307,7 @@ export default function OrdersPage() {
                                     <div>
                                         <h3 className="text-xl font-bold text-text-primary">{selectedOrder.user?.name || "Unknown User"}</h3>
                                         <div className="mt-1 flex items-center gap-3 text-sm text-text-secondary">
-                                            <span className="flex items-center gap-1"><MapPin size={14} /> {selectedOrder.user?.region || "Burkina Faso"}</span>
+                                            <span className="flex items-center gap-1"><MapPin size={14} /> {selectedOrder.user?.country || "Burkina Faso"}</span>
                                             <span className="flex items-center gap-1 font-mono">#{selectedOrder._id?.slice(-8).toUpperCase()}</span>
                                         </div>
                                     </div>

@@ -5,7 +5,7 @@ export interface User {
     name: string;
     email: string;
     role: 'customer' | 'farmer' | 'admin' | 'distributor';
-    region?: string;
+    country?: string;
     phone?: string;
     status: 'active' | 'inactive';
     lastSeen?: string;

@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/Button";
 import { Badge } from "@/components/ui/Badge";
 import { cn } from "@/lib/utils";
 
-import { getDashboardStats, AnalyticsData, KPI, RegionalStat, exportAnalytics } from "@/services/analyticsService";
+import { getDashboardStats, AnalyticsData, KPI, CountryStat, exportAnalytics } from "@/services/analyticsService";
 import { Table } from "@/components/ui/Table";
 import { useTranslation } from "@/hooks/useTranslation";
 
@@ -21,21 +21,21 @@ export default function ReportsPage() {
             setIsLoading(true);
             const stats = await getDashboardStats();
             
-            // If no regional data from API, ensure we show some Burkina Faso placeholders
-            const bfRegions = [
-                { name: "Ouagadougou", value: "0kg", pct: 0 },
-                { name: "Bobo-Dioulasso", value: "0kg", pct: 0 },
-                { name: "Koudougou", value: "0kg", pct: 0 },
-                { name: "Banfora", value: "0kg", pct: 0 },
+            // If no country data from API, ensure we show some African placeholders
+            const africaPlaceholders = [
+                { name: "Burkina Faso", value: "0kg", pct: 0 },
+                { name: "Sénégal", value: "0kg", pct: 0 },
+                { name: "Gabon", value: "0kg", pct: 0 },
+                { name: "Mali", value: "0kg", pct: 0 },
             ];
 
-            const combinedRegions = stats.regionalPerformance.length > 0 
-                ? stats.regionalPerformance 
-                : bfRegions;
+            const combinedCountries = stats.countryPerformance.length > 0 
+                ? stats.countryPerformance 
+                : africaPlaceholders;
 
             setData({
                 ...stats,
-                regionalPerformance: combinedRegions
+                countryPerformance: combinedCountries
             });
         } catch (err) {
             console.error("Failed to fetch analytics:", err);
@@ -157,10 +157,10 @@ export default function ReportsPage() {
                     <div className="rounded-2xl bg-white p-6 shadow-sm ring-1 ring-black/5 h-full">
                         <h3 className="mb-8 text-lg font-bold text-text-primary">{t('country_performance')}</h3>
                         <div className="space-y-6">
-                            {data.regionalPerformance.map((reg, i) => (
+                            {data.countryPerformance.map((reg, i) => (
                                 <div key={i} className="space-y-2">
                                     <div className="flex items-center justify-between text-sm font-bold">
-                                        <span className="text-text-primary">{reg.name}</span>
+                                        <span className="text-text-primary capitalize">{reg.name || "N/A"}</span>
                                         <span className="text-primary tabular-nums">{reg.value}</span>
                                     </div>
                                     <div className="h-2 w-full rounded-full bg-background-alt overflow-hidden">
@@ -190,7 +190,7 @@ export default function ReportsPage() {
                                 { header: "ID", accessor: (tx: any) => <span className="font-mono text-xs text-primary font-bold">{tx.id.substring(0, 8)}</span>, hiddenOnMobile: true },
                                 { header: t('date'), accessor: (tx: any) => new Date(tx.date).toLocaleDateString() + ' ' + new Date(tx.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}), hiddenOnMobile: true },
                                 { header: t('farmer'), accessor: (tx: any) => <span className="font-bold">{tx.farmer}</span> },
-                                { header: t('all_countries').replace('All ', ''), accessor: (tx: any) => tx.region, hiddenOnMobile: true },
+                                { header: t('all_countries').replace('All ', ''), accessor: (tx: any) => tx.country, hiddenOnMobile: true },
                                 { header: t('quantity'), accessor: (tx: any) => <span className="font-bold text-primary">{tx.amount}</span> },
                                 { 
                                     header: t('status'), 

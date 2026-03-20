@@ -99,7 +99,7 @@ export default function SettingsPage() {
         { id: "profile", label: t('account_profile'), icon: User },
         { id: "security", label: t('security_password'), icon: Lock },
         { id: "notifications", label: t('notifications_settings'), icon: Bell },
-        { id: "regional", label: t('country_zones'), icon: MapPin },
+        { id: "country", label: t('country_zones'), icon: MapPin },
     ];
 
     return (
@@ -310,7 +310,7 @@ export default function SettingsPage() {
                             </div>
                         )}
 
-                        {activeTab === "regional" && (
+                        {activeTab === "country" && (
                             <div className="space-y-6 animate-in fade-in duration-500">
                                 <div className="flex items-center justify-between">
                                     <div>
@@ -325,7 +325,7 @@ export default function SettingsPage() {
                                         <MapPin size={32} />
                                     </div>
                                     <div>
-                                        <h4 className="text-2xl font-extrabold text-text-primary">Burkina Faso</h4>
+                                        <h4 className="text-2xl font-extrabold text-text-primary">{user?.country || "Burkina Faso"}</h4>
                                         <p className="text-sm font-semibold text-primary">Assigned Country ID: BF-OUA-01</p>
                                     </div>
                                     <div className="flex gap-4 text-xs font-bold text-text-secondary uppercase tracking-widest mt-2">
