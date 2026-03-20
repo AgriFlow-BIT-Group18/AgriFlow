@@ -2,12 +2,14 @@
 
 import * as React from "react";
 import { Button } from "@/components/ui/Button";
-import { ArrowRight, Play, Server, Shield, Globe } from "lucide-react";
+import { ArrowRight, Play, Server, Shield, Globe, X } from "lucide-react";
 import Link from "next/link";
 import { useTranslation } from "@/hooks/useTranslation";
 
 export function Hero() {
     const { t } = useTranslation();
+    const [showDemo, setShowDemo] = React.useState(false);
+
     return (
         <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-sidebar">
             {/* Background Image with Overlay */}
@@ -44,7 +46,11 @@ export function Hero() {
                                 {t('hero_cta_start')} <ArrowRight className="ml-2" size={20} />
                             </Button>
                         </Link>
-                        <Button variant="ghost" className="h-14 px-8 text-white font-bold hover:bg-white/10 gap-2 w-full sm:w-auto">
+                        <Button 
+                            variant="ghost" 
+                            onClick={() => setShowDemo(true)}
+                            className="h-14 px-8 text-white font-bold hover:bg-white/10 gap-2 w-full sm:w-auto"
+                        >
                             <div className="flex h-10 w-10 items-center justify-center rounded-full bg-white/10">
                                 <Play size={16} fill="white" />
                             </div>
@@ -121,8 +127,54 @@ export function Hero() {
                 </div>
             </div>
 
+            {/* Demo Modal */}
+            {showDemo && (
+                <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-sidebar/95 backdrop-blur-2xl animate-in fade-in duration-300">
+                    <div className="relative w-full max-w-5xl aspect-video bg-black rounded-3xl overflow-hidden shadow-2xl border border-white/10 group">
+                        {/* Fake Video Player UI */}
+                        <div className="absolute inset-0 flex items-center justify-center">
+                            <div className="relative z-10 text-center space-y-6">
+                                <div className="h-24 w-24 rounded-full bg-primary/20 flex items-center justify-center border border-primary/30 animate-pulse">
+                                    <Play fill="white" className="text-white ml-2" size={40} />
+                                </div>
+                                <div className="space-y-2">
+                                    <h4 className="text-2xl font-black text-white">{t('hero_demo_title')}</h4>
+                                    <p className="text-white/40 font-mono text-sm tracking-widest uppercase">Video Placeholder</p>
+                                </div>
+                            </div>
+                            
+                            {/* Decorative background for fake video */}
+                            <div className="absolute inset-0">
+                                <img src="/images/hero-bg.png" className="w-full h-full object-cover blur-sm opacity-30" />
+                                <div className="absolute inset-0 bg-gradient-to-tr from-primary/40 to-secondary/40 mix-blend-overlay" />
+                            </div>
+                        </div>
+
+                        {/* Controls */}
+                        <div className="absolute bottom-0 left-0 right-0 p-8 flex items-center justify-between bg-gradient-to-t from-black/80 to-transparent">
+                            <div className="flex items-center gap-4">
+                                <div className="h-1.5 w-48 rounded-full bg-white/20">
+                                    <div className="h-full w-1/3 rounded-full bg-primary" />
+                                </div>
+                                <span className="text-xs font-mono text-white/40">01:24 / 03:45</span>
+                            </div>
+                            <Button variant="ghost" className="text-white hover:bg-white/10" onClick={() => setShowDemo(false)}>
+                                {t('hero_demo_close')}
+                            </Button>
+                        </div>
+
+                        <button 
+                            onClick={() => setShowDemo(false)}
+                            className="absolute top-6 right-6 p-2 rounded-full bg-white/5 border border-white/10 text-white hover:bg-white/10 transition-colors"
+                        >
+                            <X size={24} />
+                        </button>
+                    </div>
+                </div>
+            )}
+
             {/* Bottom Gradient Fade */}
-            <div className="absolute bottom-0 left-0 right-0 h-64 bg-gradient-to-t from-background to-transparent z-0" />
+            <div className="absolute bottom-0 left-0 right-0 h-48 bg-gradient-to-t from-background to-transparent z-0" />
         </section>
     );
 }

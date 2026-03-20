@@ -48,7 +48,7 @@ export function Features() {
     ];
 
     return (
-        <section className="py-24 bg-background relative overflow-hidden">
+        <section id="solutions" className="py-24 bg-background relative overflow-hidden">
             <div className="max-w-7xl mx-auto px-6">
                 <div className="text-center max-w-3xl mx-auto mb-20 space-y-4">
                     <h2 className="text-sm font-bold text-primary uppercase tracking-widest">{t('features_badge')}</h2>

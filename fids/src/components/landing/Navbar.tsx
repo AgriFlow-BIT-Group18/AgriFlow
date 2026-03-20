@@ -22,10 +22,10 @@ export function Navbar() {
     }, []);
 
     const navItems = [
-        { key: 'nav_solutions', label: t('nav_solutions') },
-        { key: 'nav_impact', label: t('nav_impact') },
-        { key: 'nav_tech', label: t('nav_tech') },
-        { key: 'nav_about', label: t('nav_about') }
+        { key: 'nav_solutions', label: t('nav_solutions'), href: '#solutions' },
+        { key: 'nav_impact', label: t('nav_impact'), href: '#impact' },
+        { key: 'nav_tech', label: t('nav_tech'), href: '#technology' },
+        { key: 'nav_about', label: t('nav_about'), href: '#about' }
     ];
 
     return (
@@ -51,7 +51,7 @@ export function Navbar() {
                     {navItems.map((item) => (
                         <Link 
                             key={item.key} 
-                            href="#" 
+                            href={item.href} 
                             className={cn(
                                 "text-sm font-bold transition-all hover:text-secondary",
                                 isScrolled ? "text-text-secondary" : "text-white/80"
@@ -108,7 +108,7 @@ export function Navbar() {
                     {navItems.map((item) => (
                         <Link 
                             key={item.key} 
-                            href="#" 
+                            href={item.href} 
                             onClick={() => setIsMenuOpen(false)}
                             className="text-2xl font-bold text-text-primary hover:text-primary transition-colors border-b border-gray-50 pb-4"
                         >

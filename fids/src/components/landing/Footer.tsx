@@ -8,7 +8,7 @@ import { useTranslation } from "@/hooks/useTranslation";
 export function Footer() {
     const { t } = useTranslation();
     return (
-        <footer className="bg-sidebar text-white/70 py-16">
+        <footer id="about" className="bg-sidebar border-t border-white/5 pt-24 pb-12 relative overflow-hidden">
             <div className="max-w-7xl mx-auto px-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-12 mb-16">
                     <div className="space-y-6">
