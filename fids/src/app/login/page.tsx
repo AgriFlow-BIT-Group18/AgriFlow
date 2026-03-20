@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils";
 
 import { login } from "@/services/authService";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 export default function LoginPage() {
     const [showPassword, setShowPassword] = React.useState(false);
@@ -120,9 +121,9 @@ export default function LoginPage() {
                                 {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                             </button>
                             <div className="mt-1 text-right">
-                                <a href="#" className="text-xs font-medium text-primary hover:underline">
+                                <Link href="/forgot-password" title="Forgot password?" className="text-xs font-medium text-primary hover:underline">
                                     Forgot password?
-                                </a>
+                                </Link>
                             </div>
                         </div>
 
