@@ -32,18 +32,18 @@ export function Hero() {
                     
                     <h1 className="text-4xl sm:text-5xl lg:text-7xl font-black text-white leading-[1.1] tracking-tight">
                         {t('hero_title_1')} <br />
-                        <span className="text-secondary">Distribution Hub</span> <br />
+                        <span className="text-secondary">{t('hero_title_2')}</span> <br />
                         {t('hero_title_3')}
                     </h1>
                     
                     <p className="max-w-xl text-base sm:text-lg lg:text-xl text-white/70 font-medium leading-relaxed mx-auto lg:mx-0">
-                        La plateforme professionnelle de gestion des intrants agricoles dédiée aux administrateurs nationaux et aux réseaux de distributeurs agréés au Burkina Faso.
+                        {t('hero_subtitle')}
                     </p>
 
                     <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
                         <Link href="/login" className="w-full sm:w-auto">
                             <Button className="h-14 px-10 text-lg font-bold w-full shadow-2xl shadow-primary/40 hover:scale-105 transition-transform uppercase tracking-widest">
-                                Accéder au Portail <ArrowRight className="ml-2" size={20} />
+                                {t('hero_cta_start')} <ArrowRight className="ml-2" size={20} />
                             </Button>
                         </Link>
                         <Button 

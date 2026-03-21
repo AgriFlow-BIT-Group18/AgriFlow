@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Mail, ArrowLeft, Leaf, CheckCircle2 } from "lucide-react";
+import { Mail, ArrowLeft, Leaf, CheckCircle2, ShieldCheck } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import Link from "next/link";
@@ -49,14 +49,19 @@ export default function ForgotPasswordPage() {
                     </p>
                     
                     {resetToken && (
-                        <div className="mt-6 p-4 bg-primary/5 border border-primary/20 rounded-xl text-left">
-                            <p className="text-xs font-bold text-primary uppercase tracking-widest mb-2">Simulation Mode (Dev Only)</p>
-                            <p className="text-sm text-text-secondary mb-4">Comme nous sommes en développement, voici votre lien de réinitialisation :</p>
+                        <div className="mt-8 p-6 bg-amber-50 border-2 border-amber-200 rounded-2xl text-left shadow-lg scale-105 transition-transform">
+                            <div className="flex items-center gap-2 mb-3">
+                                <ShieldCheck className="text-amber-600" size={20} />
+                                <p className="text-xs font-black text-amber-600 uppercase tracking-widest">Simulation Mode (Action Requise)</p>
+                            </div>
+                            <p className="text-sm text-amber-900/80 mb-4 font-medium">
+                                En mode développement, aucun e-mail n'est envoyé. <strong>Cliquez sur le bouton ci-dessous</strong> pour tester la réinitialisation :
+                            </p>
                             <Link 
                                 href={`/reset-password/${resetToken}`}
-                                className="inline-block w-full py-2 bg-primary text-white text-center rounded-lg font-bold text-sm hover:bg-primary-dark transition-colors"
+                                className="inline-flex items-center justify-center w-full py-3 bg-amber-600 text-white text-center rounded-xl font-black text-sm hover:bg-amber-700 transition-all shadow-md active:scale-95"
                             >
-                                Réinitialiser le mot de passe
+                                RÉINITIALISER LE MOT DE PASSE MAINTENANT
                             </Link>
                         </div>
                     )}

@@ -26,19 +26,25 @@ export default function LoginPage() {
         setIsLoading(true);
 
         try {
-            const user = await login(email, password);
-            // Redirect based on role or just to dashboard if admin
-            if (user.role === "admin") {
+            const user = await login(email, password, role);
+            // Redirect based on role
+            if (user.role.toLowerCase() === "admin") {
                 router.push("/dashboard");
             } else if (user.role.toLowerCase() === "distributor") {
                 router.push("/dashboard");
             } else {
-                router.push("/dashboard");
+                router.push("/dashboard"); // Default
             }
-        } catch (err: unknown) {
+        } catch (err: any) {
             console.error("Login failed:", err);
-            const error = err as { response?: { data?: { message?: string } } };
-            setError(error.response?.data?.message || "Invalid credentials. Please try again.");
+            const message = err.response?.data?.message || "Invalid credentials. Please try again.";
+            
+            // Highlight role mismatch if it happens
+            if (err.response?.status === 403) {
+                setError(`ACCÈS REFUSÉ : ${message}`);
+            } else {
+                setError(message);
+            }
         } finally {
             setIsLoading(false);
         }
@@ -47,31 +53,44 @@ export default function LoginPage() {
     return (
         <div className="flex min-h-screen w-full font-sans">
             {/* Left side - Illustration/Brand */}
-            <div className="relative hidden w-1/2 flex-col bg-primary lg:flex">
-                <div className="absolute inset-0 z-0 opacity-20">
-                    {/* Overlay pattern or image could go here */}
-                    <div className="h-full w-full bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-white/20 to-transparent" />
+            <div className="relative hidden w-1/2 flex-col bg-sidebar lg:flex overflow-hidden">
+                {/* Premium Background Image */}
+                <div className="absolute inset-0 z-0">
+                    <img 
+                        src="/images/login-bg.png" 
+                        className="h-full w-full object-cover opacity-60 scale-105 animate-[pulse_10s_infinite]" 
+                        alt="Background" 
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-br from-primary/40 via-sidebar/80 to-sidebar" />
                 </div>
 
-                <div className="relative z-10 flex flex-1 flex-col justify-between p-12 text-white">
-                    <div className="flex items-center gap-3">
-                        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-white/10 backdrop-blur-md">
-                            <Leaf className="text-secondary fill-current" size={28} />
+                <div className="relative z-10 flex flex-1 flex-col justify-between p-16 text-white">
+                    <div className="flex items-center gap-4">
+                        <div className="flex h-14 w-14 items-center justify-center rounded-2xl bg-white/10 backdrop-blur-xl border border-white/20 shadow-2xl">
+                            <Leaf className="text-secondary fill-current" size={32} />
                         </div>
-                        <span className="text-3xl font-bold tracking-tight">AgriFlow</span>
+                        <span className="text-4xl font-black tracking-tighter">AgriFlow</span>
                     </div>
 
-                    <div className="max-w-lg">
-                        <h1 className="text-5xl font-extrabold leading-tight tracking-tight">
-                            Modernizing agricultural input distribution.
-                        </h1>
-                        <p className="mt-6 text-lg text-white/80">
+                    <div className="max-w-xl space-y-8">
+                        <div className="space-y-4">
+                            <div className="h-1 w-20 bg-secondary rounded-full" />
+                            <h1 className="text-6xl font-black leading-[1.1] tracking-tight drop-shadow-2xl">
+                                Modernizing <br />
+                                <span className="text-secondary">Agricultural</span> <br />
+                                Distribution.
+                            </h1>
+                        </div>
+                        <p className="text-xl text-white/70 font-medium leading-relaxed max-w-lg">
                             A complete digital ecosystem for farmers, distributors, and administrators to streamline seed and fertilizer management.
                         </p>
                     </div>
 
-                    <div className="text-sm text-white/50">
-                        © 2026 AgriFlow Ecosystem • All rights reserved.
+                    <div className="flex items-center justify-between">
+                        <div className="text-sm font-bold text-white/40 uppercase tracking-[0.3em]">
+                            © 2026 AgriFlow Ecosystem
+                        </div>
+                        <div className="h-px w-24 bg-white/10" />
                     </div>
                 </div>
             </div>

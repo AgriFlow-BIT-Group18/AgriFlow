@@ -24,14 +24,14 @@ export function Products() {
             tag: t('active')
         },
         {
-            title: "Pesticide Ultra-F10",
-            desc: "Protection systémique avancée pour les cultures céréalières.",
+            title: t('product_3_title'),
+            desc: t('product_3_desc'),
             image: "/images/product-pesticide.png",
             tag: t('active')
         },
         {
-            title: "Contrôleur d'Irrigation",
-            desc: "Gestion intelligente de l'eau via IoT et capteurs de sol.",
+            title: t('product_4_title'),
+            desc: t('product_4_desc'),
             image: "/images/product-irrigation.png",
             tag: t('active')
         }
@@ -46,7 +46,7 @@ export function Products() {
                 <div className="flex flex-col md:flex-row justify-between items-end mb-16 gap-6 text-center md:text-left">
                     <div className="space-y-4 max-w-2xl mx-auto md:mx-0">
                         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/5 text-primary text-xs font-black tracking-widest uppercase border border-primary/10">
-                            <ShieldCheck size={14} /> Only for Distributors
+                            <ShieldCheck size={14} /> {t('only_for_distributors')}
                         </div>
                         <h2 className="text-sm font-bold text-primary uppercase tracking-widest">{t('products_badge')}</h2>
                         <h3 className="text-4xl lg:text-5xl font-black text-text-primary leading-tight">
@@ -88,7 +88,7 @@ export function Products() {
                                         <p className="text-text-secondary font-medium leading-relaxed">{p.desc}</p>
                                     </div>
                                     <Button variant="outline" className="h-12 border-2 px-8 font-black gap-2 hover:bg-primary hover:text-white hover:border-primary">
-                                        <LayoutGrid size={18} /> Gérer l'inventaire
+                                        <LayoutGrid size={18} /> {t('manage_inventory')}
                                     </Button>
                                 </div>
                             </div>

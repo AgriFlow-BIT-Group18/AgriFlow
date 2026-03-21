@@ -2,6 +2,14 @@
   "name": "fids",
   "version": "0.1.0",
   "private": true,
+  "author": "AgriFlow Team",
+  "contributors": [
+    "KIENDREBEOGO Moussa",
+    "KYEMTORE Gloria",
+    "COMPAORE Adile",
+    "OUEDRAOGO Akram",
+    "YAMEOGO Angeline"
+  ],
   "scripts": {
     "dev": "next dev",
     "build": "next build",

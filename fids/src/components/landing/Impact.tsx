@@ -66,7 +66,7 @@ export function Impact() {
                         <div className="hidden sm:flex p-8 rounded-3xl bg-gradient-to-br from-primary/20 to-secondary/20 border border-white/10 items-center justify-center text-center">
                             <div className="space-y-2">
                                 <Sprout className="text-white mx-auto" size={40} />
-                                <div className="text-white font-bold text-lg">Cultiver l'avenir</div>
+                                <div className="text-white font-bold text-lg">{t('impact_quote')}</div>
                             </div>
                         </div>
                     </div>
