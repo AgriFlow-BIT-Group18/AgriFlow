@@ -114,7 +114,7 @@ export default function DeliveriesPage() {
                                 <div className="space-y-1">
                                     <div className="flex items-center gap-2">
                                         <span className="font-mono text-xs font-bold text-primary">{delivery._id.substring(0, 8)}</span>
-                                        <Badge status={delivery.status === 'in_transit' ? 'delivery' : delivery.status as any} className="text-[10px] uppercase">{delivery.status}</Badge>
+                                        <Badge status={delivery.status === 'in_transit' ? 'in_transit' : delivery.status as any} className="text-[10px] uppercase">{delivery.status}</Badge>
                                     </div>
                                     <h3 className="flex items-center gap-2 text-lg font-bold text-text-primary">
                                         {typeof delivery.order !== 'string' ? delivery.order.shippingAddress?.address || 'Unknown location' : 'Loading...'}

@@ -4,6 +4,7 @@ import * as React from "react";
 import { Bell, Search, User, LogOut, ChevronDown, Menu } from "lucide-react";
 import { Badge } from "@/components/ui/Badge";
 import { logout } from "@/services/authService";
+import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { LanguageSelector } from "./LanguageSelector";
 import { useTranslation } from "@/hooks/useTranslation";
@@ -101,17 +102,18 @@ const Header: React.FC<HeaderProps> = ({
                         onClick={() => setIsProfileOpen(!isProfileOpen)}
                         className="flex items-center gap-3 rounded-lg p-1 transition-all hover:bg-background-alt"
                     >
-                        <div className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/10 text-primary font-semibold border border-primary/20 overflow-hidden">
                             {avatar ? (
-                                <img 
-                                    src={avatar.startsWith('http') ? avatar : `${process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'http://localhost:5000'}${avatar}`} 
-                                    alt={userName} 
-                                    className="h-full w-full object-cover"
-                                />
+                                <div className="relative h-9 w-9 overflow-hidden">
+                                    <Image 
+                                        src={avatar.startsWith('http') ? avatar : `${process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'http://localhost:5000'}${avatar}`} 
+                                        alt={userName} 
+                                        fill
+                                        className="object-cover"
+                                    />
+                                </div>
                             ) : (
                                 userName.charAt(0)
                             )}
-                        </div>
                         <div className="hidden text-left sm:block">
                             <p className="text-sm font-semibold text-text-primary leading-tight">
                                 {userName}

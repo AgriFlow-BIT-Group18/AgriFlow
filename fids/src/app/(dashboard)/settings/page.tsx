@@ -8,11 +8,13 @@ import { Input } from "@/components/ui/Input";
 import { Badge } from "@/components/ui/Badge";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/hooks/useTranslation";
+import { AuthResponse } from "@/services/authService";
+import Image from "next/image";
 
 export default function SettingsPage() {
     const { t, language } = useTranslation();
     const [activeTab, setActiveTab] = React.useState("profile");
-    const [user, setUser] = React.useState<any>(null);
+    const [user, setUser] = React.useState<AuthResponse | null>(null);
     const [isSaving, setIsSaving] = React.useState(false);
     const [saveMessage, setSaveMessage] = React.useState<{ type: 'success' | 'error', text: string } | null>(null);
 
@@ -152,15 +154,18 @@ export default function SettingsPage() {
                                     <div className="relative group">
                                         <div className="flex h-24 w-24 items-center justify-center rounded-full bg-primary/10 text-primary text-3xl font-bold border-4 border-white shadow-xl ring-1 ring-gray-100 overflow-hidden">
                                             {user?.avatar ? (
-                                                <img 
+                                            <div className="relative h-full w-full">
+                                                <Image 
                                                     src={user.avatar.startsWith('http') ? user.avatar : `${process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'http://localhost:5000'}${user.avatar}`} 
                                                     alt={name} 
-                                                    className="h-full w-full object-cover"
+                                                    fill
+                                                    className="object-cover"
                                                     key={user.avatar} // Force re-render if URL changes
                                                 />
-                                            ) : (
-                                                name ? name.charAt(0).toUpperCase() : "U"
-                                            )}
+                                            </div>
+                                        ) : (
+                                            name ? name.charAt(0).toUpperCase() : "U"
+                                        )}
                                         </div>
                                         <button type="button" className="absolute -bottom-1 -right-1 flex h-8 w-8 items-center justify-center rounded-full bg-white text-text-secondary shadow-lg border border-gray-100 hover:text-primary transition-all">
                                             <Globe size={14} />
@@ -188,7 +193,7 @@ export default function SettingsPage() {
                                                                 headers: { 'Content-Type': 'multipart/form-data' }
                                                             });
                                                             
-                                                            const newUser = { ...user, avatar: response.data.avatar };
+                                                            const newUser = { ...user, avatar: response.data.avatar } as AuthResponse;
                                                             localStorage.setItem('user', JSON.stringify(newUser));
                                                             setUser(newUser);
                                                             setSaveMessage({ type: 'success', text: "Avatar updated successfully!" });

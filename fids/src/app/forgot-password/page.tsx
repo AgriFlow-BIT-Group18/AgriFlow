@@ -20,15 +20,16 @@ export default function ForgotPasswordPage() {
         setIsLoading(true);
 
         try {
-            const data = await forgotPassword(email);
+            const data = (await forgotPassword(email)) as any;
             setIsSubmitted(true);
             if (data.resetToken) {
                 setResetToken(data.resetToken);
                 console.log("Dev Reset Token:", data.resetToken);
             }
-        } catch (err: any) {
+        } catch (err: unknown) {
+            const axiosError = err as any;
             console.error("Forgot password request failed:", err);
-            setError(err.response?.data?.message || "Failed to send reset email. Please try again.");
+            setError(axiosError.response?.data?.message || "Failed to send reset email. Please try again.");
         } finally {
             setIsLoading(false);
         }
@@ -55,7 +56,7 @@ export default function ForgotPasswordPage() {
                                 <p className="text-xs font-black text-amber-600 uppercase tracking-widest">Simulation Mode (Action Requise)</p>
                             </div>
                             <p className="text-sm text-amber-900/80 mb-4 font-medium">
-                                En mode développement, aucun e-mail n'est envoyé. <strong>Cliquez sur le bouton ci-dessous</strong> pour tester la réinitialisation :
+                                En mode développement, aucun e-mail n&apos;est envoyé. <strong>Cliquez sur le bouton ci-dessous</strong> pour tester la réinitialisation :
                             </p>
                             <Link 
                                 href={`/reset-password/${resetToken}`}

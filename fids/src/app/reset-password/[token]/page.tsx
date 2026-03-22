@@ -10,7 +10,6 @@ import { resetPassword } from "@/services/authService";
 
 export default function ResetPasswordPage() {
     const { token } = useParams();
-    const router = useRouter();
     const [password, setPassword] = React.useState("");
     const [confirmPassword, setConfirmPassword] = React.useState("");
     const [showPassword, setShowPassword] = React.useState(false);
@@ -37,9 +36,10 @@ export default function ResetPasswordPage() {
         try {
             await resetPassword(token as string, password);
             setIsSuccess(true);
-        } catch (err: any) {
+        } catch (err: unknown) {
+            const axiosError = err as any; 
             console.error("Reset password failed:", err);
-            setError(err.response?.data?.message || "Échec de la réinitialisation du mot de passe. Le lien a peut-être expiré.");
+            setError(axiosError.response?.data?.message || "Échec de la réinitialisation du mot de passe. Le lien a peut-être expiré.");
         } finally {
             setIsLoading(false);
         }

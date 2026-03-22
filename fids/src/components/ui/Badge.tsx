@@ -2,7 +2,7 @@ import * as React from "react";
 import { cn } from "@/lib/utils";
 
 export interface BadgeProps extends React.HTMLAttributes<HTMLDivElement> {
-    status?: "pending" | "approved" | "delivery" | "delivered" | "rejected";
+    status?: "pending" | "approved" | "delivery" | "delivered" | "rejected" | "assigned" | "in_transit" | "shipped";
 }
 
 const Badge = ({ className, status = "pending", ...props }: BadgeProps) => {
@@ -12,6 +12,9 @@ const Badge = ({ className, status = "pending", ...props }: BadgeProps) => {
         delivery: "bg-status-delivery text-white",
         delivered: "bg-status-delivered text-white",
         rejected: "bg-status-rejected text-white",
+        assigned: "bg-status-delivery/80 text-white",
+        in_transit: "bg-status-delivery text-white",
+        shipped: "bg-status-delivery text-white",
     };
 
     return (

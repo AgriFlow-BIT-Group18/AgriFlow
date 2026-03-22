@@ -85,7 +85,7 @@ export default function UserManagementPage() {
         setEditingUser(user);
         setNewUserName(user.name);
         setNewUserEmail(user.email);
-        setNewUserRole(user.role as any);
+        setNewUserRole(user.role as "admin" | "distributor" | "farmer");
         setNewUserCountry(user.country || "Burkina Faso");
         setNewUserPhone(user.phone || "");
         setIsModalOpen(true);
@@ -207,7 +207,7 @@ export default function UserManagementPage() {
                                 <option>{t('all_countries')}</option>
                                 <option>Burkina Faso</option>
                                 <option>Sénégal</option>
-                                <option>Côte d'Ivoire</option>
+                                <option>Côte d&apos;Ivoire</option>
                                 <option>Mali</option>
                                 <option>Gabon</option>
                                 <option>Ghana</option>
@@ -372,7 +372,7 @@ export default function UserManagementPage() {
                                 >
                                     <option value="Burkina Faso">Burkina Faso</option>
                                     <option value="Sénégal">Sénégal</option>
-                                    <option value="Côte d'Ivoire">Côte d'Ivoire</option>
+                                    <option value="Côte d&apos;Ivoire">Côte d&apos;Ivoire</option>
                                     <option value="Mali">Mali</option>
                                     <option value="Gabon">Gabon</option>
                                     <option value="Ghana">Ghana</option>

@@ -2,8 +2,9 @@
 
 import * as React from "react";
 import { Button } from "@/components/ui/Button";
-import { ArrowRight, Play, Server, Shield, Globe, X } from "lucide-react";
+import { ArrowRight, Play, Shield, Globe, X } from "lucide-react";
 import Link from "next/link";
+import Image from "next/image";
 import { useTranslation } from "@/hooks/useTranslation";
 
 export function Hero() {
@@ -14,10 +15,12 @@ export function Hero() {
         <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-sidebar">
             {/* Background Image with Overlay */}
             <div className="absolute inset-0 z-0">
-                <img 
+                <Image 
                     src="/images/hero-bg.png" 
                     alt="AgriFlow Hero" 
-                    className="h-full w-full object-cover opacity-40 mix-blend-overlay"
+                    fill
+                    className="object-cover opacity-40 mix-blend-overlay"
+                    priority
                 />
                 <div className="absolute inset-0 bg-gradient-to-b from-sidebar/60 via-sidebar/20 to-sidebar" />
             </div>
@@ -133,10 +136,11 @@ export function Hero() {
                     <div className="relative w-full max-w-5xl aspect-video bg-black rounded-3xl overflow-hidden shadow-2xl border border-white/10 group">
                         {/* Cinematic Demo Video Representation */}
                         <div className="absolute inset-0 flex items-center justify-center group/player">
-                            <img 
+                            <Image 
                                 src="/images/demo-video-thumb.png" 
-                                className="w-full h-full object-cover transition-transform duration-[10s] group-hover/player:scale-110" 
                                 alt="Demo Content"
+                                fill
+                                className="object-cover transition-transform duration-[10s] group-hover/player:scale-110" 
                             />
                             <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px] group-hover/player:backdrop-blur-0 transition-all duration-700" />
                             

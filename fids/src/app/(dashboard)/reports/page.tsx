@@ -2,12 +2,12 @@
 
 import * as React from "react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
-import { BarChart3, TrendingUp, Users, Package, Download, Calendar, Filter, ArrowUp, ArrowDown, Leaf } from "lucide-react";
+import { BarChart3, TrendingUp, Download, Calendar, ArrowUp, ArrowDown, Leaf, Package } from "lucide-react";
 import { Button } from "@/components/ui/Button";
-import { Badge } from "@/components/ui/Badge";
+import { Badge, BadgeProps } from "@/components/ui/Badge";
 import { cn } from "@/lib/utils";
 
-import { getDashboardStats, AnalyticsData, KPI, CountryStat, exportAnalytics } from "@/services/analyticsService";
+import { getDashboardStats, AnalyticsData, KPI, CountryStat, Transaction, exportAnalytics } from "@/services/analyticsService";
 import { Table } from "@/components/ui/Table";
 import { useTranslation } from "@/hooks/useTranslation";
 
@@ -187,15 +187,15 @@ export default function ReportsPage() {
                     <div className="overflow-x-auto">
                         <Table
                             columns={[
-                                { header: "ID", accessor: (tx: any) => <span className="font-mono text-xs text-primary font-bold">{tx.id.substring(0, 8)}</span>, hiddenOnMobile: true },
-                                { header: t('date'), accessor: (tx: any) => new Date(tx.date).toLocaleDateString() + ' ' + new Date(tx.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}), hiddenOnMobile: true },
-                                { header: t('farmer'), accessor: (tx: any) => <span className="font-bold">{tx.farmer}</span> },
-                                { header: t('all_countries').replace('All ', ''), accessor: (tx: any) => tx.country, hiddenOnMobile: true },
-                                { header: t('quantity'), accessor: (tx: any) => <span className="font-bold text-primary">{tx.amount}</span> },
+                                { header: "ID", accessor: (tx: Transaction) => <span className="font-mono text-xs text-primary font-bold">{tx.id.substring(0, 8)}</span>, hiddenOnMobile: true },
+                                { header: t('date'), accessor: (tx: Transaction) => new Date(tx.date).toLocaleDateString() + ' ' + new Date(tx.date).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}), hiddenOnMobile: true },
+                                { header: t('farmer'), accessor: (tx: Transaction) => <span className="font-bold">{tx.farmer}</span> },
+                                { header: t('all_countries').replace('All ', ''), accessor: (tx: Transaction) => tx.country, hiddenOnMobile: true },
+                                { header: t('quantity'), accessor: (tx: Transaction) => <span className="font-bold text-primary">{tx.amount}</span> },
                                 { 
                                     header: t('status'), 
-                                    accessor: (tx: any) => (
-                                        <Badge status={tx.status as any} className="text-[10px] uppercase font-bold">
+                                    accessor: (tx: Transaction) => (
+                                        <Badge status={tx.status as BadgeProps['status']} className="text-[10px] uppercase font-bold">
                                             {tx.status}
                                         </Badge>
                                     ) 

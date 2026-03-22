@@ -1,9 +1,11 @@
 "use client";
 
 import * as React from "react";
+import Image from "next/image";
 import { MessageSquare, X, Send, Sparkles, Bot, ArrowRight, User, Languages, 
     Mic, MicOff, Volume2, VolumeX, Plus, Link, FileText, Camera, ImageIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { getCurrentUser, AuthResponse } from "@/services/authService";
 
 const translations = {
     en: {
@@ -37,10 +39,10 @@ export function AIAssistant() {
     const [lang, setLang] = React.useState<"en" | "fr">("fr");
     const [attachments, setAttachments] = React.useState<{ type: 'file' | 'image' | 'link', name: string }[]>([]);
     const [isAttachmentMenuOpen, setIsAttachmentMenuOpen] = React.useState(false);
-    const [messages, setMessages] = React.useState<any[]>([]);
+    const [messages, setMessages] = React.useState<{ role: string; content: string; timestamp?: string }[]>([]);
     const [inputValue, setInputValue] = React.useState("");
     const [isLoading, setIsLoading] = React.useState(false);
-    const [user, setUser] = React.useState<any>(null);
+    const [user, setUser] = React.useState<AuthResponse | null>(null);
     
     // Voice state
     const [isRecording, setIsRecording] = React.useState(false);
@@ -65,7 +67,6 @@ export function AIAssistant() {
     React.useEffect(() => {
         // Load user
         try {
-            const { getCurrentUser } = require("@/services/authService");
             setUser(getCurrentUser());
         } catch (e) {
             console.error("Failed to load user in AIAssistant", e);
@@ -167,7 +168,7 @@ export function AIAssistant() {
                     if (text) {
                         setInputValue(text);
                     }
-                } catch (err: any) {
+                } catch (err: unknown) {
                     console.error(err);
                 } finally {
                     setIsTranscribing(false);
@@ -221,12 +222,13 @@ export function AIAssistant() {
                 content: aiResponse
             }]);
             speak(aiResponse);
-        } catch (error: any) {
+        } catch (error: unknown) {
+            const err = error as Error;
             setMessages(prev => [...prev, {
                 role: "assistant",
                 content: lang === "en" 
-                    ? `Error: ${error.message}.`
-                    : `Erreur : ${error.message}.`
+                    ? `Error: ${err.message}.`
+                    : `Erreur : ${err.message}.`
             }]);
         } finally {
             setIsLoading(false);
@@ -365,11 +367,14 @@ export function AIAssistant() {
                                         <Sparkles size={14} />
                                     ) : (
                                         user?.avatar ? (
-                                            <img 
-                                                src={user.avatar.startsWith('http') ? user.avatar : `${process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'http://localhost:5000'}${user.avatar}`} 
-                                                alt={user.name} 
-                                                className="h-full w-full object-cover"
-                                            />
+                                            <div className="relative h-full w-full">
+                                                <Image 
+                                                    src={user.avatar.startsWith('http') ? user.avatar : `${process.env.NEXT_PUBLIC_API_URL?.replace('/api', '') || 'http://localhost:5000'}${user.avatar}`} 
+                                                    alt={user.name} 
+                                                    fill
+                                                    className="object-cover"
+                                                />
+                                            </div>
                                         ) : (
                                             <User size={14} />
                                         )

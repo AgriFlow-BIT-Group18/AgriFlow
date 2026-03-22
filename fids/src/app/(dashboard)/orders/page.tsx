@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
-import { Search, MapPin, Calendar, Check, X, Eye, ArrowRight } from "lucide-react";
+import { Search, MapPin, Calendar, Check, X, Eye } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Badge } from "@/components/ui/Badge";
@@ -141,7 +141,7 @@ export default function OrdersPage() {
                                     <option>{t('all_countries')}</option>
                                     <option>Burkina Faso</option>
                                     <option>Sénégal</option>
-                                    <option>Côte d'Ivoire</option>
+                                    <option>Côte d&apos;Ivoire</option>
                                     <option>Mali</option>
                                 </select>
                             </div>

@@ -67,9 +67,10 @@ export const getChatCompletion = async (messages: Message[], persona: AIPersona 
         );
 
         return response.data.choices[0].message.content;
-    } catch (error: any) {
-        console.error('Groq API Error:', error.response?.data || error.message);
-        throw new Error(error.response?.data?.error?.message || 'Failed to connect to Groq AI');
+    } catch (error: unknown) {
+        const err = error as any;
+        console.error('Groq API Error:', err.response?.data || err.message);
+        throw new Error(err.response?.data?.error?.message || 'Failed to connect to Groq AI');
     }
 };
 
@@ -93,8 +94,9 @@ export const transcribeAudio = async (audioBlob: Blob) => {
             }
         );
         return response.data.text;
-    } catch (error: any) {
-        console.error('Transcription Error:', error.response?.data || error.message);
-        throw new Error(error.response?.data?.error?.message || 'Speech recognition failed');
+    } catch (error: unknown) {
+        const err = error as any;
+        console.error('Transcription Error:', err.response?.data || err.message);
+        throw new Error(err.response?.data?.error?.message || 'Speech recognition failed');
     }
 };

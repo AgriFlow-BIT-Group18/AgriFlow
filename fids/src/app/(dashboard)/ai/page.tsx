@@ -2,15 +2,15 @@
 
 import * as React from "react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
-import { Plus, Search, Filter, AlertCircle, Edit2, Trash2, Box, Beaker, Sprout, 
-    Paperclip, ImageIcon, Link, FileText, Camera, X,
-    Send, Sparkles, Bot, User, Mic } from "lucide-react";
+import { Plus, Box, 
+    ImageIcon, Link, FileText, Camera, X,
+    Send, Sparkles, Bot, User, Mic, BarChart3, Truck, ArrowRight } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
 import { cn } from "@/lib/utils";
 import { AIPersona } from "@/services/aiService";
 
-const PERSONAS: { id: AIPersona, name: string, sub: string, icon: any, color: string, desc: string, welcome: string }[] = [
+const PERSONAS: { id: AIPersona, name: string, sub: string, icon: React.ElementType, color: string, desc: string, welcome: string }[] = [
     { 
         id: 'neural', 
         name: 'AgriFlow Neural', 
@@ -49,7 +49,7 @@ const PERSONAS: { id: AIPersona, name: string, sub: string, icon: any, color: st
     }
 ];
 
-import { BarChart3, Truck, ArrowRight } from "lucide-react";
+
 
 export default function AIPage() {
     const [messages, setMessages] = React.useState<{
@@ -59,7 +59,6 @@ export default function AIPage() {
     }[]>([]);
     const [persona, setPersona] = React.useState<AIPersona>("neural");
     const [isPersonaModalOpen, setIsPersonaModalOpen] = React.useState(false);
-    const [selectedStatus, setSelectedStatus] = React.useState("All Status");
     const [attachments, setAttachments] = React.useState<{ type: 'file' | 'image' | 'link', name: string }[]>([]);
     const [isAttachmentMenuOpen, setIsAttachmentMenuOpen] = React.useState(false);
     const [inputValue, setInputValue] = React.useState("");
@@ -87,7 +86,7 @@ export default function AIPage() {
                 }
             ]);
         }
-    }, [persona]);
+    }, [persona, activePersona.welcome]);
 
     // Persistence: Save
     React.useEffect(() => {
@@ -145,10 +144,11 @@ export default function AIPage() {
                 content: aiResponse,
                 timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
             }]);
-        } catch (error: any) {
+        } catch (error: unknown) {
+            const err = error as Error;
             setMessages(prev => [...prev, {
                 role: "assistant",
-                content: `Error: ${error.message}. Please check your connection or API key.`,
+                content: `Error: ${err.message}. Please check your connection or API key.`,
                 timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
             }]);
         } finally {

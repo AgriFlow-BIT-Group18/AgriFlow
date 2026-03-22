@@ -15,6 +15,7 @@ export interface CountryStat {
 }
 
 export interface Transaction {
+    [key: string]: any;
     id: string;
     farmer: string;
     country: string;

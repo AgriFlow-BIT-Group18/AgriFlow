@@ -3,8 +3,9 @@
 import * as React from "react";
 import { useTranslation } from "@/hooks/useTranslation";
 import { Button } from "@/components/ui/Button";
-import { LayoutGrid, ArrowRight, ChevronLeft, ChevronRight, ShieldCheck } from "lucide-react";
+import { LayoutGrid, ChevronLeft, ChevronRight, ShieldCheck } from "lucide-react";
 import { cn } from "@/lib/utils";
+import Image from "next/image";
 
 export function Products() {
     const { t } = useTranslation();
@@ -74,10 +75,11 @@ export function Products() {
                                 )}
                             >
                                 <div className="relative aspect-[16/10] overflow-hidden">
-                                    <img 
+                                    <Image 
                                         src={p.image} 
                                         alt={p.title} 
-                                        className="h-full w-full object-cover transition-transform duration-1000 group-hover:scale-110"
+                                        fill
+                                        className="object-cover transition-transform duration-1000 group-hover:scale-110"
                                     />
                                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
                                 </div>

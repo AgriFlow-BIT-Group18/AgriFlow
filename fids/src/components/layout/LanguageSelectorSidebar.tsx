@@ -20,7 +20,7 @@ export const LanguageSelectorSidebar: React.FC = () => {
                     return (
                         <button
                             key={lang.code}
-                            onClick={() => setLanguage(lang.code as any)}
+                            onClick={() => setLanguage(lang.code)}
                             className={cn(
                                 "flex items-center gap-2 rounded-lg px-3 py-2 text-xs font-semibold transition-all duration-200",
                                 isSelected
