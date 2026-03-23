@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Inter } from "next/font/google";
 import "./globals.css";
 import { TranslationProvider } from "@/hooks/useTranslation";
@@ -7,6 +7,13 @@ const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
 });
+
+export const viewport: Viewport = {
+  themeColor: "#2D6C50",
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+};
 
 export const metadata: Metadata = {
   title: {
@@ -94,7 +101,7 @@ export const metadata: Metadata = {
     title: "AgriFlow - Digitaliser la distribution agricole pour un meilleur rendement",
     description: "La plateforme de référence pour la gestion transparente et efficace des intrants agricoles au Burkina Faso.",
     images: [{
-      url: "/og-image.jpg",
+      url: "/og-image.png",
       width: 1200,
       height: 630,
       alt: "AgriFlow - Moderniser l'agriculture en Afrique"
@@ -104,7 +111,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "AgriFlow - Digitalizing Agricultural Distribution",
     description: "Increase farming efficiency with our digital solution for certified seed and fertilizer management.",
-    images: ["/og-image.jpg"]
+    images: ["/og-image.png"]
   },
   robots: {
     index: true,
@@ -119,7 +126,12 @@ export const metadata: Metadata = {
   },
   verification: {
     google: "F2PJsA9LRgLdGifaEakE0iTd1I2x3YDrowGwZnD3VO8",
-  }
+  },
+  icons: {
+    icon: "/icon.png",
+    shortcut: "/favicon.ico",
+    apple: "/apple-touch-icon.png",
+  },
 };
 
 export default function RootLayout({

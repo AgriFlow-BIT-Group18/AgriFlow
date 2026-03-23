@@ -7,16 +7,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const staticPages = [
     '',
     '/login',
-    '/dashboard',
-    '/inventory',
-    '/orders',
-    '/deliveries',
-    '/reports',
-    '/ai',
-    '/users',
-    '/settings',
+    '/forgot-password',
   ].map((route) => ({
-    url: `${baseUrl}${route ? route : ''}`,
+    url: `${baseUrl}${route}`,
     lastModified: currentDate,
     changeFrequency: 'daily' as const,
     priority: route === '' ? 1 : 0.8,
