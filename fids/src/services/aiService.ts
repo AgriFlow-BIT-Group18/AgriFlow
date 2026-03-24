@@ -6,26 +6,22 @@ const getApiKey = () => localStorage.getItem('groq_api_key') || process.env.NEXT
 
 export interface Message {
     role: 'system' | 'user' | 'assistant';
-    content: string;
+    content: string | any[];
 }
 
 export type AIPersona = 'neural' | 'analytics' | 'logistics' | 'inventory';
 
 const PERSONA_PROMPTS: Record<AIPersona, string> = {
-    neural: `AgriFlow Neural: Primary AI brain. Professional, concise, premium. 
-    (FR: Cerveau IA principal. Professionnel, concis, haut de gamme.)`,
+    neural: `AgriFlow Neural: Primary system brain. Professional and concise oversight. You can see and analyze images.`,
     
-    analytics: `AgriFlow Analytics: Data scientist for distribution trends and KPIs in Burkina Faso.
-    (FR: Scientifique des données pour les tendances de distribution et les indicateurs de performance au Burkina Faso.)`,
+    analytics: `AgriFlow Analytics: Data scientist for trends and KPIs. Expert in statistics. You can see and analyze charts or data images.`,
 
-    logistics: `AgriFlow Logistics: Operations expert for delivery tracking and route optimization.
-    (FR: Expert en opérations pour le suivi des livraisons et l'optimisation des itinéraires.)`,
+    logistics: `AgriFlow Logistics: Operations expert for delivery tracking and route optimization. You can see and analyze maps or delivery photos.`,
 
-    inventory: `AgriFlow Inventory: Stock management specialist for seeds and fertilizers.
-    (FR: Spécialiste de la gestion des stocks de semences et d'engrais.)`
+    inventory: `AgriFlow Inventory: Stock management specialist for seeds and fertilizers. You can see and analyze warehouse photos.`
 };
 
-export const getChatCompletion = async (messages: Message[], persona: AIPersona = 'neural') => {
+export const getChatCompletion = async (messages: Message[], persona: AIPersona = 'neural', images?: string[]) => {
     const apiKey = getApiKey();
     
     if (!apiKey) {
@@ -35,26 +31,45 @@ export const getChatCompletion = async (messages: Message[], persona: AIPersona 
     const basePrompt = PERSONA_PROMPTS[persona];
     const systemPrompt: Message = {
         role: 'system',
-        content: `${basePrompt}
+        content: `### IDENTITY:
+        ${basePrompt}
         
-        ### LANGUAGE RULES:
-        1. DETECT the language of the user's latest message.
-        2. RESPOND EXCLUSIVELY in that exact same language (e.g. French, English, Spanish, local dialects if understood, etc.).
-        3. Do not assume French or English. Match the user's language perfectly.
-        4. NEVER mix languages in a single response unless specifically asked.
+        ### CRITICAL LANGUAGE RULE:
+        - ALWAYS detect the language of the user's message.
+        - ALWAYS respond in that SAME EXACT language (English, French, Spanish, Portuguese, etc.).
+        - If the user switches languages, YOU switch immediately.
+        - DO NOT assume a default language based on the project location (Burkina Faso).
         
-        ### CONTEXT & RULES:
-        - CURRENCY: Always use "FCFA".
-        - PROJECT: AgriFlow is a digital system for agricultural input distribution in West Africa.
-        - TONE: Professional, efficient, and direct.`
+        ### CONTEXT:
+        - AgriFlow: Digital agricultural distribution system.
+        - Currency: Always use "FCFA".
+        - Tone: Professional, concise, direct.`
     };
+
+    // Use vision model if images are present, otherwise stick to faster text model
+    const model = images && images.length > 0 ? 'meta-llama/llama-4-scout-17b-16e-instruct' : 'llama-3.1-8b-instant';
+    
+    const formattedMessages = [...messages];
+    if (images && images.length > 0) {
+        const lastMsg = formattedMessages[formattedMessages.length - 1];
+        if (lastMsg.role === 'user') {
+            const content: any[] = [{ type: 'text', text: lastMsg.content as string }];
+            images.forEach(img => {
+                content.push({
+                    type: 'image_url',
+                    image_url: { url: img.startsWith('data:') ? img : `data:image/jpeg;base64,${img}` }
+                });
+            });
+            lastMsg.content = content;
+        }
+    }
 
     try {
         const response = await axios.post(
             GROQ_API_URL,
             {
-                model: 'llama-3.3-70b-versatile',
-                messages: [systemPrompt, ...messages],
+                model,
+                messages: [systemPrompt, ...formattedMessages],
                 temperature: 0.7,
                 max_tokens: 1024,
             },

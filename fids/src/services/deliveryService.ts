@@ -10,12 +10,18 @@ export interface Delivery {
     currentLocation?: string;
     estimatedDeliveryTime?: string;
     deliveredAt?: string;
+    distributorId?: string;
     createdAt: string;
     updatedAt: string;
 }
 
 export const getDeliveries = async (): Promise<Delivery[]> => {
     const response = await api.get('/deliveries');
+    return response.data;
+};
+
+export const getMyDeliveries = async (): Promise<Delivery[]> => {
+    const response = await api.get('/deliveries/my-deliveries');
     return response.data;
 };
 

@@ -4,7 +4,7 @@ import * as React from "react";
 import DashboardLayout from "@/components/layout/DashboardLayout";
 import { Plus, Box, 
     ImageIcon, Link, FileText, Camera, X,
-    Send, Sparkles, Bot, User, Mic, BarChart3, Truck, ArrowRight } from "lucide-react";
+    Send, Sparkles, Bot, User, Mic, BarChart3, Truck, ArrowRight, Volume2, Square } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Modal } from "@/components/ui/Modal";
 import { cn } from "@/lib/utils";
@@ -59,10 +59,18 @@ export default function AIPage() {
     }[]>([]);
     const [persona, setPersona] = React.useState<AIPersona>("neural");
     const [isPersonaModalOpen, setIsPersonaModalOpen] = React.useState(false);
-    const [attachments, setAttachments] = React.useState<{ type: 'file' | 'image' | 'link', name: string }[]>([]);
+    const [attachments, setAttachments] = React.useState<{ type: 'file' | 'image' | 'link', name: string, data?: string }[]>([]);
     const [isAttachmentMenuOpen, setIsAttachmentMenuOpen] = React.useState(false);
     const [inputValue, setInputValue] = React.useState("");
     const [isLoading, setIsLoading] = React.useState(false);
+    
+    // Voice state
+    const [isRecording, setIsRecording] = React.useState(false);
+    const [isSpeaking, setIsSpeaking] = React.useState(false);
+    const mediaRecorderRef = React.useRef<MediaRecorder | null>(null);
+    const audioChunksRef = React.useRef<Blob[]>([]);
+    const fileInputRef = React.useRef<HTMLInputElement>(null);
+    
     const messagesEndRef = React.useRef<HTMLDivElement>(null);
     const activePersona = PERSONAS.find(p => p.id === persona) || PERSONAS[0];
 
@@ -137,23 +145,149 @@ export default function AIPage() {
                 content: m.content
             }));
             
-            const aiResponse = await getChatCompletion(chatHistory, persona);
+            // Extract base64 images
+            const images = attachments
+                .filter(a => a.type === 'image' && a.data)
+                .map(a => a.data as string);
+            
+            const aiResponse = await getChatCompletion(chatHistory, persona, images);
             
             setMessages(prev => [...prev, {
                 role: "assistant",
                 content: aiResponse,
                 timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
             }]);
+            
+            // Auto-speak if it's a short response and not too annoying
+            if (aiResponse.length < 200) {
+                speakText(aiResponse);
+            }
         } catch (error: unknown) {
             const err = error as Error;
+            let errorMessage = `Error: ${err.message}.`;
+            if (err.message.includes('decommissioned')) {
+                errorMessage = "Le modèle de vision est en cours de mise à jour. Veuillez réessayer sans image ou patienter quelques instants.";
+            }
             setMessages(prev => [...prev, {
                 role: "assistant",
-                content: `Error: ${err.message}. Please check your connection or API key.`,
+                content: errorMessage,
                 timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
             }]);
         } finally {
             setIsLoading(false);
         }
+    };
+
+    const toggleRecording = async () => {
+        if (isRecording) {
+            mediaRecorderRef.current?.stop();
+            setIsRecording(false);
+        } else {
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+                const recorder = new MediaRecorder(stream);
+                mediaRecorderRef.current = recorder;
+                audioChunksRef.current = [];
+
+                recorder.ondataavailable = (e) => {
+                    if (e.data.size > 0) audioChunksRef.current.push(e.data);
+                };
+
+                recorder.onstop = async () => {
+                    const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+                    setIsLoading(true);
+                    try {
+                        const { transcribeAudio } = await import("@/services/aiService");
+                        const text = await transcribeAudio(audioBlob);
+                        if (text) handleSend(text);
+                    } catch (err) {
+                        console.error("Transcription failed", err);
+                    } finally {
+                        setIsLoading(false);
+                    }
+                    stream.getTracks().forEach(track => track.stop());
+                };
+
+                recorder.start();
+                setIsRecording(true);
+            } catch (err) {
+                console.error("Microphone access denied", err);
+                alert("Please allow microphone access to use voice features.");
+            }
+        }
+    };
+
+    const detectLanguage = (text: string): string => {
+        const lower = text.toLowerCase();
+        
+        // Portuguese indicators
+        if (/\b(o|a|e|é|do|da|no|na|um|uma|pelo|pela|você|português|obrigado)\b/i.test(lower) || /[ãõáéíóú]/i.test(lower)) {
+            return 'pt-PT';
+        }
+        // Spanish indicators
+        if (/\b(el|la|y|es|en|un|una|por|para|usted|español|gracias|buenos)\b/i.test(lower) || /[ñ¿¡]/.test(lower)) {
+            return 'es-ES';
+        }
+        // French indicators
+        if (/\b(le|la|et|est|dans|un|une|par|pour|vous|français|merci|bonjour)\b/i.test(lower) || /[àâçéèêëîïôûù]/i.test(lower)) {
+            return 'fr-FR';
+        }
+        // Default to English
+        return 'en-US';
+    };
+
+    const speakText = (text: string) => {
+        // Cancel any ongoing speech
+        window.speechSynthesis.cancel();
+        
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = detectLanguage(text);
+        
+        utterance.onstart = () => setIsSpeaking(true);
+        utterance.onend = () => setIsSpeaking(false);
+        utterance.onerror = () => setIsSpeaking(false);
+        
+        window.speechSynthesis.speak(utterance);
+    };
+
+    const stopSpeaking = () => {
+        window.speechSynthesis.cancel();
+        setIsSpeaking(false);
+    };
+
+    const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        const reader = new FileReader();
+        reader.onload = (event) => {
+            const data = event.target?.result as string;
+            const type = file.type.startsWith('image/') ? 'image' : 'file';
+            setAttachments(prev => [...prev, { type, name: file.name, data }]);
+            setIsAttachmentMenuOpen(false);
+        };
+        reader.readAsDataURL(file);
+        
+        // Reset input
+        if (fileInputRef.current) fileInputRef.current.value = "";
+    };
+
+    const exportChat = () => {
+        if (messages.length === 0) return;
+        
+        const content = messages.map(m => 
+            `[${m.timestamp}] ${m.role === 'user' ? 'USER' : activePersona.name}:\n${m.content}\n`
+        ).join('\n---\n\n');
+        
+        const blob = new Blob([content], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.download = `AgriFlow_Chat_${activePersona.id}_${new Date().toISOString().split('T')[0]}.txt`;
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        URL.revokeObjectURL(url);
     };
 
     const clearHistory = () => {
@@ -200,7 +334,7 @@ export default function AIPage() {
                             </div>
                         </div>
                         <div className="flex gap-1.5 sm:gap-2">
-                            <Button variant="outline" size="sm" className="h-8 text-[10px] sm:h-10 sm:text-xs">Export</Button>
+                            <Button variant="outline" size="sm" className="h-8 text-[10px] sm:h-10 sm:text-xs" onClick={exportChat}>Export</Button>
                             <Button variant="ghost" size="sm" className="h-8 text-[10px] sm:h-10 sm:text-xs text-status-rejected" onClick={clearHistory}>Clear</Button>
                         </div>
                     </div>
@@ -242,12 +376,22 @@ export default function AIPage() {
                                             })}
                                         </div>
                                     </div>
-                                    <p className={cn(
-                                        "text-[9px] font-bold text-text-secondary uppercase tracking-tighter",
-                                        msg.role === "user" ? "text-right" : "text-left"
-                                    )}>
-                                        {msg.timestamp}
-                                    </p>
+                                    <div className="flex items-center justify-between gap-4">
+                                        <p className={cn(
+                                            "text-[9px] font-bold text-text-secondary uppercase tracking-tighter",
+                                            msg.role === "user" ? "text-right" : "text-left"
+                                        )}>
+                                            {msg.timestamp}
+                                        </p>
+                                        {msg.role === "assistant" && (
+                                            <button 
+                                                onClick={() => speakText(msg.content)}
+                                                className="rounded-full p-1 text-text-secondary hover:text-primary hover:bg-primary/10 transition-colors"
+                                            >
+                                                <Volume2 size={12} />
+                                            </button>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
                         ))}
@@ -310,8 +454,7 @@ export default function AIPage() {
                                             </div>
                                             <button 
                                                 onClick={() => {
-                                                    setAttachments(prev => [...prev, { type: 'file', name: 'Stock_Report.pdf' }]);
-                                                    setIsAttachmentMenuOpen(false);
+                                                    fileInputRef.current?.click();
                                                 }}
                                                 className="w-full flex items-center gap-3 p-2.5 rounded-xl hover:bg-background-alt text-text-primary transition-all group"
                                             >
@@ -322,8 +465,11 @@ export default function AIPage() {
                                             </button>
                                             <button 
                                                 onClick={() => {
-                                                    setAttachments(prev => [...prev, { type: 'image', name: 'Field_Photo.jpg' }]);
-                                                    setIsAttachmentMenuOpen(false);
+                                                    if (fileInputRef.current) {
+                                                        fileInputRef.current.setAttribute("accept", "image/*");
+                                                        fileInputRef.current.setAttribute("capture", "environment");
+                                                        fileInputRef.current.click();
+                                                    }
                                                 }}
                                                 className="w-full flex items-center gap-3 p-2.5 rounded-xl hover:bg-background-alt text-text-primary transition-all group"
                                             >
@@ -356,10 +502,16 @@ export default function AIPage() {
                                         )}
                                     >
                                         <Plus size={18} className="sm:hidden" />
-                                        <Plus size={20} className="hidden sm:block" />
-                                    </button>
-                                </div>
-                                <textarea
+                                    <Plus size={20} className="hidden sm:block" />
+                                </button>
+                                <input 
+                                    type="file" 
+                                    ref={fileInputRef} 
+                                    className="hidden" 
+                                    onChange={handleFileSelect}
+                                />
+                            </div>
+                            <textarea
                                     value={inputValue}
                                     onChange={(e) => setInputValue(e.target.value)}
                                     onKeyDown={(e) => { 
@@ -374,7 +526,32 @@ export default function AIPage() {
                                     rows={1}
                                 />
                                 <div className="flex gap-1.5 sm:gap-2">
-                                    <button className="flex h-9 w-9 sm:h-11 sm:w-11 items-center justify-center rounded-lg sm:rounded-xl text-text-secondary hover:bg-gray-100 transition-colors"><Mic size={18} className="sm:hidden" /><Mic size={22} className="hidden sm:block" /></button>
+                                    <button 
+                                        onClick={toggleRecording}
+                                        className={cn(
+                                            "flex h-9 w-9 sm:h-11 sm:w-11 items-center justify-center rounded-lg sm:rounded-xl transition-all shadow-md active:scale-95",
+                                            isRecording 
+                                                ? "bg-status-rejected text-white animate-pulse" 
+                                                : "text-text-secondary hover:bg-gray-100 bg-white border border-gray-100"
+                                        )}
+                                    >
+                                        {isRecording ? <Square size={18} className="sm:hidden" /> : <Mic size={18} className="sm:hidden" />}
+                                        {isRecording ? <Square size={22} className="hidden sm:block" /> : <Mic size={22} className="hidden sm:block" />}
+                                    </button>
+                                    
+                                    {isSpeaking && (
+                                        <button 
+                                            onClick={stopSpeaking}
+                                            className="flex h-9 w-9 sm:h-11 sm:w-11 items-center justify-center rounded-lg sm:rounded-xl bg-orange-100 text-orange-600 hover:bg-orange-600 hover:text-white transition-all shadow-sm group"
+                                            title="Stop speaking"
+                                        >
+                                            <div className="flex items-end gap-0.5 h-4">
+                                                <div className="w-1 bg-current animate-voice-bar-1 h-2 group-hover:bg-white" />
+                                                <div className="w-1 bg-current animate-voice-bar-2 h-4 group-hover:bg-white" />
+                                                <div className="w-1 bg-current animate-voice-bar-3 h-3 group-hover:bg-white" />
+                                            </div>
+                                        </button>
+                                    )}
                                     <button
                                         onClick={() => {
                                             handleSend();

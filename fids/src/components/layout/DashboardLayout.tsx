@@ -57,7 +57,6 @@ export default function DashboardLayout({
                     userName={user.name} 
                     role={displayRole} 
                     avatar={user.avatar}
-                    notificationCount={pendingCount} 
                     onMenuToggle={() => setIsMobileMenuOpen(!isMobileMenuOpen)} 
                 />
 

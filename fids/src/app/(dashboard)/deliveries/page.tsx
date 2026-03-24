@@ -9,9 +9,10 @@ import { Input } from "@/components/ui/Input";
 import { Modal } from "@/components/ui/Modal";
 import { cn } from "@/lib/utils";
 
-import { getDeliveries, createDelivery, updateDeliveryStatus, Delivery } from "@/services/deliveryService";
+import { getDeliveries, createDelivery, updateDeliveryStatus, getMyDeliveries, Delivery } from "@/services/deliveryService";
 import { getOrders, Order } from "@/services/orderService";
 import { getCurrentUser, AuthResponse } from "@/services/authService";
+import { getUsers, User as APIUser } from "@/services/userService";
 import { useTranslation } from "@/hooks/useTranslation";
 
 export default function DeliveriesPage() {
@@ -21,20 +22,28 @@ export default function DeliveriesPage() {
     const [isLoading, setIsLoading] = React.useState(true);
     const [user, setUser] = React.useState<AuthResponse | null>(null);
     const [isModalOpen, setIsModalOpen] = React.useState(false);
+    const [distributors, setDistributors] = React.useState<APIUser[]>([]);
 
     // Form state
     const [selectedOrderId, setSelectedOrderId] = React.useState("");
+    const [selectedDistributorId, setSelectedDistributorId] = React.useState("");
     const [driverName, setDriverName] = React.useState("");
     const [driverPhone, setDriverPhone] = React.useState("");
 
     const fetchDeliveries = async () => {
         try {
             setIsLoading(true);
-            const [delData, ordData] = await Promise.all([getDeliveries(), getOrders()]);
+            const currentUser = getCurrentUser();
+            const [delData, ordData, userData] = await Promise.all([
+                currentUser?.role === 'admin' ? getDeliveries() : getMyDeliveries(),
+                getOrders(),
+                getUsers()
+            ]);
             setDeliveries(delData);
             setOrders(ordData.filter(o => o.status === "approved"));
+            setDistributors(userData.filter(u => u.role === 'distributor'));
         } catch (err) {
-            console.error("Failed to fetch deliveries:", err);
+            console.error("Failed to fetch data:", err);
         } finally {
             setIsLoading(false);
         }
@@ -50,6 +59,7 @@ export default function DeliveriesPage() {
         try {
             await createDelivery({
                 order: selectedOrderId,
+                distributorId: selectedDistributorId,
                 driverName,
                 driverPhone,
             });
@@ -147,7 +157,7 @@ export default function DeliveriesPage() {
                                 </div>
                             </div>
 
-                            {user?.role === 'admin' && (
+                            {(user?.role === 'admin' || user?.role === 'distributor') && (
                                 <div className="mt-6 flex gap-2">
                                     <Button 
                                         onClick={async () => {
@@ -185,6 +195,27 @@ export default function DeliveriesPage() {
                                     <option key={order._id} value={order._id}>
                                         {t('order_number')}{order._id.substring(0, 8)} - {order.user.name}
                                     </option>
+                                ))}
+                            </select>
+                        </div>
+                        <div className="space-y-1.5">
+                            <label className="text-sm font-bold text-text-primary">{t('distributors')}</label>
+                            <select
+                                required
+                                className="h-10 w-full rounded-md border border-gray-300 bg-white px-3 text-sm outline-none focus:ring-2 focus:ring-primary cursor-pointer"
+                                value={selectedDistributorId}
+                                onChange={(e) => {
+                                    setSelectedDistributorId(e.target.value);
+                                    const dist = distributors.find(d => d._id === e.target.value);
+                                    if (dist) {
+                                        setDriverName(dist.name);
+                                        if (dist.phone) setDriverPhone(dist.phone.toString());
+                                    }
+                                }}
+                            >
+                                <option value="">{t('select_distributor') || "Select Distributor"}</option>
+                                {distributors.map(d => (
+                                    <option key={d._id} value={d._id}>{d.name}</option>
                                 ))}
                             </select>
                         </div>
