@@ -21,6 +21,22 @@ The **Frontend Interface for Distribution Systems (FIDS)** is the administrative
 - **Data Fetching**: Axios
 - **State Management**: React Context & Hooks
 
+---
+
+## 🔄 API Integration & Architecture
+
+### 📡 Backend Connection
+The dashboard connects to the AgriFlow Backend API using **Axios**.
+- **Base URL**: Configured via `NEXT_PUBLIC_API_URL` (default: `http://localhost:5000/api`).
+- **Authentication**: A custom Axios interceptor (in `src/services/api.ts`) automatically attaches the **JWT Bearer Token** from `localStorage` to every outgoing request.
+
+### 🤖 AI Sidekick (Groq Integration)
+The AI assistant (Neural, Analytics, Logistics, Inventory) communicates directly with the **Groq Cloud API**:
+- **Models**: Uses `llama-3.1-8b-instant` for text and `meta-llama/llama-4-scout-17b-16e-instruct` for vision-based tasks.
+- **Capabilities**: Multilingual support, image analysis for warehouse/logistics photos, and real-time data insights.
+
+---
+
 ## 📂 Project Structure
 
 - `src/app/`: Next.js App Router pages and layouts.

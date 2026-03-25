@@ -36,6 +36,23 @@ The ecosystem consists of three main components:
 
 ---
 
+## 🔄 System Data Flow & Integration
+
+The AgriFlow ecosystem is designed for seamless data synchronization across all platforms:
+
+1.  **Centralized Backend**: The Node.js/Express API (connected to MongoDB) acts as the single source of truth for all resource, order, and user data.
+2.  **Web Dashboard (Administrative)**: Connects to the Backend via REST API to manage the catalog, audit orders, and view global analytics. It also integrates directly with **Groq AI** for administrative assistance.
+3.  **Mobile App (Operational)**: Connects to the same Backend API to allow farmers to place orders and track deliveries. It also uses **Groq AI** for localized agricultural support.
+4.  **Security Layer**: All communication between Frontend/Mobile and Backend is secured using **JWT (JSON Web Tokens)**.
+
+### 📅 Order Lifecycle Flow
+1.  **Initiation**: A Farmer places an order via the **Mobile App**.
+2.  **Processing**: The **Backend** validates the stock and records the pending order.
+3.  **Audit**: A Distributor or Admin reviews and approves the order via the **Web Dashboard**.
+4.  **Logistics**: A Delivery is scheduled on the **Web Dashboard**, which becomes visible to the Farmer on the **Mobile App** for real-time tracking.
+
+---
+
 ## 🚀 Key Features
 
 - **Role-Based Access Control**: Granular permissions for Admins, Distributors, and Farmers.
