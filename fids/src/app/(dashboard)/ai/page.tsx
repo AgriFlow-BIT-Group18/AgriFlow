@@ -167,10 +167,8 @@ export default function AIPage() {
                 timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
             }]);
             
-            // Auto-speak strictly if the user used the microphone
-            if (isVoiceSource) {
-                speakText(aiResponse);
-            }
+            // Voice source handled via STT only, no automatic TTS as requested.
+
         } catch (error: unknown) {
             const err = error as Error;
             let errorMessage = `Error: ${err.message}.`;
@@ -392,14 +390,7 @@ export default function AIPage() {
                                         )}>
                                             {msg.timestamp}
                                         </p>
-                                        {msg.role === "assistant" && (
-                                            <button 
-                                                onClick={() => speakText(msg.content)}
-                                                className="rounded-full p-1 text-text-secondary hover:text-primary hover:bg-primary/10 transition-colors"
-                                            >
-                                                <Volume2 size={12} />
-                                            </button>
-                                        )}
+
                                     </div>
                                 </div>
                             </div>
