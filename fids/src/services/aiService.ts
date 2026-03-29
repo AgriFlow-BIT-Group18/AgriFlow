@@ -38,8 +38,9 @@ export const getChatCompletion = async (messages: Message[], persona: AIPersona 
 
     const systemPrompt: Message = {
         role: 'system',
-        content: `### IDENTITY:\n        ${basePrompt}\n        \n        ### CRITICAL LANGUAGE RULE — ABSOLUTE PRIORITY:\n        - ALWAYS detect the language of the user's message.\n        - ALWAYS respond in that SAME EXACT language (English, French, Spanish, Portuguese, etc.).\n        - If the user switches languages, YOU switch immediately.\n        - NEVER respond in Swahili unless the user speaks Swahili.\n        - DO NOT assume a default language based on the project location (Burkina Faso).\n        \n        ### CONTEXT:\n        - AgriFlow: Digital agricultural distribution system.\n        - Currency: Always use "FCFA".\n        - Tone: Professional, concise, direct.${voiceInstruction}`
+        content: `### IDENTITY:\n        ${basePrompt}\n        \n        ### CORE INSTRUCTION:\n        - Always respond in the same language as the user's latest message.\n        - Be natural and helpful.\n        - Use "FCFA" for currency.\n        - Context: AgriFlow digital agricultural distribution system.`
     };
+
 
 
     // Use vision model if images are present, otherwise stick to faster text model

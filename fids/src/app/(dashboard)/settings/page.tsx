@@ -6,6 +6,7 @@ import { User, Lock, Bell, Shield, MapPin, Globe, Save } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { Badge } from "@/components/ui/Badge";
+import { Cpu } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { useTranslation } from "@/hooks/useTranslation";
 import { AuthResponse } from "@/services/authService";
@@ -28,6 +29,10 @@ export default function SettingsPage() {
     const [newPassword, setNewPassword] = React.useState("");
     const [confirmPassword, setConfirmPassword] = React.useState("");
 
+    // AI/Groq state
+    const [groqKey, setGroqKey] = React.useState("");
+
+
     const fileInputRef = React.useRef<HTMLInputElement>(null);
 
     React.useEffect(() => {
@@ -39,7 +44,12 @@ export default function SettingsPage() {
             setEmail(userData.email || "");
             setPhone(userData.phone || "");
         }
+        
+        // Load API key from local storage
+        const storedKey = localStorage.getItem('groq_api_key');
+        if (storedKey) setGroqKey(storedKey);
     }, []);
+
 
     const handleSaveProfile = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -97,12 +107,23 @@ export default function SettingsPage() {
         }
     };
 
+    const handleSaveAiSettings = (e: React.FormEvent) => {
+        e.preventDefault();
+        setIsSaving(true);
+        localStorage.setItem('groq_api_key', groqKey);
+        setSaveMessage({ type: 'success', text: "AI Core settings updated successfully!" });
+        setIsSaving(false);
+        setTimeout(() => setSaveMessage(null), 3000);
+    };
+
     const tabs = [
         { id: "profile", label: t('account_profile'), icon: User },
         { id: "security", label: t('security_password'), icon: Lock },
         { id: "notifications", label: t('notifications_settings'), icon: Bell },
         { id: "country", label: t('country_zones'), icon: MapPin },
+        { id: "ai", label: "AI Core", icon: Cpu },
     ];
+
 
     return (
         <DashboardLayout>
@@ -346,6 +367,62 @@ export default function SettingsPage() {
                                 </div>
                             </div>
                         )}
+
+                        {activeTab === "ai" && (
+                            <form className="max-w-2xl space-y-8 animate-in fade-in duration-500" onSubmit={handleSaveAiSettings}>
+                                <div className="space-y-4">
+                                    <h3 className="text-lg font-bold text-text-primary flex items-center gap-2">
+                                        <Cpu size={22} className="text-primary" /> AgriFlow Neural Intelligence Core
+                                    </h3>
+                                    <p className="text-sm text-text-secondary">Configure your AI engine settings and API integrations. These settings are stored locally on your device for security.</p>
+                                </div>
+
+                                <div className="rounded-2xl border border-primary/10 bg-primary/5 p-6 space-y-4">
+                                    <div className="flex items-center justify-between">
+                                        <div className="flex items-center gap-2">
+                                            <div className="h-2 w-2 rounded-full bg-green-500 animate-pulse" />
+                                            <p className="text-xs font-bold uppercase tracking-widest text-primary">Engine: Groq Llama-3 (Active)</p>
+                                        </div>
+                                        <Badge status="approved">Enterprise Ready</Badge>
+                                    </div>
+                                    
+                                    <div className="space-y-4 pt-2">
+                                        <div className="space-y-1.5">
+                                            <div className="flex items-center justify-between">
+                                                <label className="text-sm font-bold text-text-primary">Groq Cloud API Key</label>
+                                                <a href="https://console.groq.com/keys" target="_blank" rel="noopener noreferrer" className="text-[10px] font-bold text-primary hover:underline">Get Key from Groq Console</a>
+                                            </div>
+                                            <div className="relative group">
+                                                <Input 
+                                                    type="password" 
+                                                    placeholder="gsk_..." 
+                                                    value={groqKey} 
+                                                    onChange={(e) => setGroqKey(e.target.value)} 
+                                                    className="font-mono bg-white"
+                                                />
+                                            </div>
+                                            <p className="text-[10px] text-text-secondary italic">This key enables STT/TTS and LLM capabilities for the assistant.</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div className="rounded-xl bg-blue-50 p-4 border border-blue-100 flex gap-3 text-blue-800">
+                                    <Shield size={20} className="shrink-0" />
+                                    <div className="text-sm">
+                                        <p className="font-bold uppercase tracking-tighter text-[10px] mb-1">Local Identity Protection</p>
+                                        <p className="opacity-90 leading-snug text-xs">Your API key is stored only in your local browser storage and is never sent to our servers. All AI interactions happen directly between your device and the AI provider.</p>
+                                    </div>
+                                </div>
+
+                                <div className="pt-6 border-t border-gray-100 flex justify-end">
+                                    <Button type="submit" className="gap-2 px-8 shadow-lg shadow-primary/20" isLoading={isSaving}>
+                                        <Save size={18} />
+                                        Save AI Configuration
+                                    </Button>
+                                </div>
+                            </form>
+                        )}
+
                     </div>
                 </div>
             </div>
