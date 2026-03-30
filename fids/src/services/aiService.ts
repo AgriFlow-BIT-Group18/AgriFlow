@@ -38,7 +38,7 @@ export const getChatCompletion = async (messages: Message[], persona: AIPersona 
 
     const systemPrompt: Message = {
         role: 'system',
-        content: `### IDENTITY:\n        ${basePrompt}\n        \n        ### CORE INSTRUCTION:\n        - Always respond in the same language as the user's latest message.\n        - Be natural and helpful.\n        - Use "FCFA" for currency.\n        - Context: AgriFlow digital agricultural distribution system.`
+        content: `### IDENTITY:\n        ${basePrompt}\n        \n        ### CORE INSTRUCTION:\n        - Always respond in the SAME language as the user's latest message.\n        - STRICT: Do not start an English response with "Bonjour" or any French greeting.\n        - STRICT: If the user speaks English, respond 100% in English. If the user speaks French, respond 100% in French.\n        - Use "FCFA" for currency.\n        - Context: AgriFlow digital agricultural distribution system.`
     };
 
 

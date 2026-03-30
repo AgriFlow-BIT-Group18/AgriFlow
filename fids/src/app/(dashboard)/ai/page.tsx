@@ -18,7 +18,7 @@ const PERSONAS: { id: AIPersona, name: string, sub: string, icon: React.ElementT
         icon: Bot, 
         color: 'bg-primary',
         desc: 'Supervision globale et assistance générale.',
-        welcome: 'Bonjour ! Je suis AgriFlow Neural. Je supervise l\'ensemble de la plateforme. Comment puis-je vous aider aujourd\'hui ?'
+        welcome: 'Hello! I am AgriFlow Neural. I supervise the entire platform. How can I help you today?'
     },
     { 
         id: 'analytics', 
@@ -26,8 +26,8 @@ const PERSONAS: { id: AIPersona, name: string, sub: string, icon: React.ElementT
         sub: 'Data Scientist', 
         icon: BarChart3, 
         color: 'bg-blue-600',
-        desc: 'Expert en rapports, tendances et performance régionale.',
-        welcome: 'Bonjour. Je suis AgriFlow Analytics. Prêt à analyser vos données de distribution et à identifier des tendances ?'
+        desc: 'Expert in reports, trends, and regional performance.',
+        welcome: 'Hello. I am AgriFlow Analytics. Ready to analyze your distribution data and identify trends?'
     },
     { 
         id: 'logistics', 
@@ -35,8 +35,8 @@ const PERSONAS: { id: AIPersona, name: string, sub: string, icon: React.ElementT
         sub: 'Operations Manager', 
         icon: Truck, 
         color: 'bg-orange-600',
-        desc: 'Spécialisé dans le suivi des livraisons et l\'optimisation des routes.',
-        welcome: 'Logistique disponible. Besoin de suivre une livraison ou d\'optimiser un itinéraire au Burkina Faso ?'
+        desc: 'Specialized in delivery tracking and route optimization.',
+        welcome: 'Logistics core online. Need to track a delivery or optimize a route in Burkina Faso?'
     },
     { 
         id: 'inventory', 
@@ -44,8 +44,8 @@ const PERSONAS: { id: AIPersona, name: string, sub: string, icon: React.ElementT
         sub: 'Stock Specialist', 
         icon: Box, 
         color: 'bg-purple-600',
-        desc: 'Concentré sur les niveaux de stock et les alertes d\'approvisionnement.',
-        welcome: 'Spécialiste des stocks disponible. Quels niveaux de semences ou d\'engrais souhaitez-vous vérifier aujourd\'hui ?'
+        desc: 'Focused on stock levels and supply alerts.',
+        welcome: 'Inventory specialist here. Which seed or fertilizer levels would you like to check today?'
     }
 ];
 
@@ -304,7 +304,7 @@ export default function AIPage() {
             setMessages([
                 {
                     role: "assistant",
-                    content: `History cleared for ${activePersona.name}. How can I help you now?`,
+                    content: `System reset for ${activePersona.name}. How can I assist you now?`,
                     timestamp: new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })
                 }
             ]);
